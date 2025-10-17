@@ -8,18 +8,22 @@ import random
 from datetime import datetime, timedelta
 from PIIRecord import StaffPII
 
-# Load SSN ranges from external JSON file
-with open("state_ssn_ranges.json", "r") as f:
-    STATE_SSN_RANGES = json.load(f)
+# Load consolidated state data from external JSON file
+with open("values_by_state.json", "r") as f:
+    STATE_DATA = json.load(f)
 
-# Load cities from external JSON file
-with open("cities.json", "r") as f:
-    cities_data = json.load(f)
-    # Flatten to list of (city, zip) tuples - creates one tuple per zip code
-    # Cities with more zip codes will be proportionally more likely to be selected
-    NJ_CITIES = [(city["city"], zip_code)
-                 for city in cities_data["New Jersey"]
-                 for zip_code in city["zip_codes"]]
+# Extract New Jersey specific data
+STATE_SSN_RANGES = {state: data["ssn_ranges"] for state, data in STATE_DATA.items()}
+NJ_DATA = STATE_DATA["New Jersey"]
+
+# Flatten cities to list of (city, zip) tuples - creates one tuple per zip code
+# Cities with more zip codes will be proportionally more likely to be selected
+NJ_CITIES = [(city["city"], zip_code)
+             for city in NJ_DATA["cities"]
+             for zip_code in city["zip_codes"]]
+
+# Extract NJ area codes from JSON data
+NJ_AREA_CODES = [int(code) for code in NJ_DATA["area_codes"]]
 
 # Sample data for generating realistic records
 FIRST_NAMES = [
@@ -121,8 +125,7 @@ def generate_ssn(state=None, bias_percentage=0.1):
 
 def generate_phone():
     """Generate a realistic phone number with valid NJ area codes."""
-    area_codes = [201, 551, 732, 908, 973, 609, 856, 862]
-    area_code = random.choice(area_codes)
+    area_code = random.choice(NJ_AREA_CODES)
     exchange = random.randint(200, 999)  # Avoid 555
     if exchange == 555:
         exchange = random.randint(200, 554)
@@ -319,8 +322,8 @@ def main():
     # Convert records to dictionaries
     records_dict = [record.to_dict() for record in records]
 
-    # Write to JSON file
-    output_file = "test_staff_records.json"
+    # Write to JSON file in outputs directory
+    output_file = "outputs/test_staff_records.json"
     with open(output_file, "w") as f:
         json.dump(records_dict, f, indent=2)
 
