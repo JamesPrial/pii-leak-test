@@ -11,7 +11,7 @@ This is a synthetic PII (Personally Identifiable Information) data generator des
 ALWAYS PROACTIVELY use subagents where appropriate
 
 Before beginning any file editing/creation/etc, use @agent-git-ops to check out a new working tree from main
-After finishing, commit and open a PR, also using @agent-git-ops
+After finishing, commit, merge with main, and delete the branch you created, also using @agent-git-ops
 
 ## Key Commands
 
