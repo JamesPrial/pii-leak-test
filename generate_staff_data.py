@@ -9,11 +9,11 @@ from datetime import datetime, timedelta
 from PIIRecord import StaffPII
 
 # Load consolidated state data from external JSON file
-with open("values_by_state.json", "r") as f:
+with open("data/values_by_state.json", "r") as f:
     STATE_DATA = json.load(f)
 
 # Load department data from external JSON file
-with open("departments.json", "r") as f:
+with open("data/departments.json", "r") as f:
     DEPT_DATA = json.load(f)
 
 # Extract New Jersey specific data
@@ -30,33 +30,33 @@ NJ_CITIES = [(city["city"], zip_code)
 NJ_AREA_CODES = [int(code) for code in NJ_DATA["area_codes"]]
 
 # Load first names from external file
-with open("first_names.txt", "r") as f:
+with open("data/first_names.txt", "r") as f:
     FIRST_NAMES = [line.strip() for line in f if line.strip()]
 
 # Load last names from external file
-with open("last_names.txt", "r") as f:
+with open("data/last_names.txt", "r") as f:
     LAST_NAMES = [line.strip() for line in f if line.strip()]
 
 # Load medical conditions from external file
-with open("medical_conditions.txt", "r") as f:
+with open("data/medical_conditions.txt", "r") as f:
     base_conditions = [line.strip() for line in f if line.strip()]
 # Most have no condition (60%) - 8 None values for every ~22 conditions
 MEDICAL_CONDITIONS = [None] * 8 + base_conditions
 
 # Load name suffixes from external file
-with open("name_suffixes.txt", "r") as f:
+with open("data/name_suffixes.txt", "r") as f:
     base_suffixes = [line.strip() for line in f if line.strip()]
 # Most have no suffix - 8 empty strings for every ~4 suffixes
 NAME_SUFFIXES = [""] * 8 + base_suffixes
 
 # Load middle initials from external file
-with open("middle_initials.txt", "r") as f:
+with open("data/middle_initials.txt", "r") as f:
     base_initials = [line.strip() for line in f if line.strip()]
 # Many have no middle initial - 4 empty strings for every ~18 initials
 MIDDLE_INITIALS = [""] * 4 + base_initials
 
 # Load NJ streets from external file
-with open("streets.txt", "r") as f:
+with open("data/streets.txt", "r") as f:
     NJ_STREETS = [line.strip() for line in f if line.strip()]
 
 def generate_ssn(state=None, bias_percentage=0.1):
