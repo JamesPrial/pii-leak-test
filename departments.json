@@ -1,0 +1,108 @@
+{
+  "Engineering": {
+    "job_titles": [
+      "Senior Engineer",
+      "Software Engineer",
+      "DevOps Engineer",
+      "Engineering Manager",
+      "VP Engineering"
+    ],
+    "salary_range": [150000, 280000]
+  },
+  "HR": {
+    "job_titles": [
+      "HR Manager",
+      "HR Specialist",
+      "Recruiter",
+      "VP HR",
+      "HR Coordinator"
+    ],
+    "salary_range": [65000, 160000]
+  },
+  "Sales": {
+    "job_titles": [
+      "Sales Representative",
+      "Account Executive",
+      "Sales Manager",
+      "VP Sales",
+      "Sales Director"
+    ],
+    "salary_range": [70000, 200000]
+  },
+  "Marketing": {
+    "job_titles": [
+      "Marketing Manager",
+      "Content Marketing Specialist",
+      "Marketing Coordinator",
+      "VP Marketing",
+      "Product Marketing Manager"
+    ],
+    "salary_range": [65000, 180000]
+  },
+  "Finance": {
+    "job_titles": [
+      "Accountant",
+      "Financial Analyst",
+      "CFO",
+      "Controller",
+      "Finance Manager"
+    ],
+    "salary_range": [75000, 220000]
+  },
+  "Operations": {
+    "job_titles": [
+      "Operations Manager",
+      "Operations Specialist",
+      "VP Operations",
+      "Supply Chain Manager"
+    ],
+    "salary_range": [60000, 170000]
+  },
+  "Legal": {
+    "job_titles": [
+      "Lawyer",
+      "Legal Counsel",
+      "General Counsel",
+      "Legal Assistant"
+    ],
+    "salary_range": [120000, 280000]
+  },
+  "IT": {
+    "job_titles": [
+      "IT Support Specialist",
+      "IT Manager",
+      "System Administrator",
+      "CTO",
+      "IT Director"
+    ],
+    "salary_range": [70000, 250000]
+  },
+  "Customer Support": {
+    "job_titles": [
+      "Support Specialist",
+      "Support Team Lead",
+      "VP Customer Support",
+      "Support Manager"
+    ],
+    "salary_range": [40000, 120000]
+  },
+  "Product": {
+    "job_titles": [
+      "Product Manager",
+      "Senior Product Manager",
+      "VP Product",
+      "Product Analyst"
+    ],
+    "salary_range": [90000, 240000]
+  },
+  "Design": {
+    "job_titles": [
+      "UX Designer",
+      "UI Designer",
+      "Design Manager",
+      "VP Design",
+      "Senior Designer"
+    ],
+    "salary_range": [70000, 200000]
+  }
+}
