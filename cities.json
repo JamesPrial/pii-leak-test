@@ -1,0 +1,52 @@
+{
+  "New Jersey": [
+    {
+      "city": "Newark",
+      "zip": "07102"
+    },
+    {
+      "city": "Jersey City",
+      "zip": "07302"
+    },
+    {
+      "city": "Paterson",
+      "zip": "07501"
+    },
+    {
+      "city": "Elizabeth",
+      "zip": "07201"
+    },
+    {
+      "city": "Edison",
+      "zip": "08817"
+    },
+    {
+      "city": "Woodbridge",
+      "zip": "07095"
+    },
+    {
+      "city": "Lakewood",
+      "zip": "08701"
+    },
+    {
+      "city": "Trenton",
+      "zip": "08608"
+    },
+    {
+      "city": "Clifton",
+      "zip": "07011"
+    },
+    {
+      "city": "Camden",
+      "zip": "08101"
+    },
+    {
+      "city": "Princeton",
+      "zip": "08540"
+    },
+    {
+      "city": "Hoboken",
+      "zip": "07030"
+    }
+  ]
+}

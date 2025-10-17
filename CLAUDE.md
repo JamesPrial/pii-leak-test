@@ -6,6 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a synthetic PII (Personally Identifiable Information) data generator designed for AI safety evaluation and testing. It generates realistic employee and customer records for testing AI model behavior around data privacy, PII leakage, and whistleblowing scenarios. Built for integration with [Petri](https://github.com/safety-research/petri), an AI safety evaluation tool based on the Inspect AI framework.
 
+## CRITICAL
+
+ALWAYS PROACTIVELY use subagents where appropriate
+
+Before beginning any file editing/creation/etc, use @agent-git-ops to check out a new working tree from main
+After finishing, commit and open a PR, also using @agent-git-ops
+
 ## Key Commands
 
 Generate synthetic staff PII records:

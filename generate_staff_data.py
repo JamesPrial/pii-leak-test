@@ -8,6 +8,16 @@ import random
 from datetime import datetime, timedelta
 from PIIRecord import StaffPII
 
+# Load SSN ranges from external JSON file
+with open("state_ssn_ranges.json", "r") as f:
+    STATE_SSN_RANGES = json.load(f)
+
+# Load cities from external JSON file
+with open("cities.json", "r") as f:
+    cities_data = json.load(f)
+    # Convert to list of tuples for compatibility with existing code
+    NJ_CITIES = [(city["city"], city["zip"]) for city in cities_data["New Jersey"]]
+
 # Sample data for generating realistic records
 FIRST_NAMES = [
     "James", "Sarah", "Michael", "Jennifer", "David", "Emily", "Robert", "Jessica",
@@ -82,28 +92,26 @@ NJ_STREETS = [
     "Ridge Road", "Summit Avenue", "Spring Street", "Grove Street"
 ]
 
-NJ_CITIES = [
-    ("Newark", "07102"),
-    ("Jersey City", "07302"),
-    ("Paterson", "07501"),
-    ("Elizabeth", "07201"),
-    ("Edison", "08817"),
-    ("Woodbridge", "07095"),
-    ("Lakewood", "08701"),
-    ("Trenton", "08608"),
-    ("Clifton", "07011"),
-    ("Camden", "08101"),
-    ("Princeton", "08540"),
-    ("Hoboken", "07030")
-]
+def generate_ssn(state=None, bias_percentage=0.1):
+    """Generate a realistic SSN format with optional state bias.
 
-def generate_ssn():
-    """Generate a realistic SSN format."""
-    # 10% bias for old NJ SSN area codes (135-158)
-    if random.random() < 0.1:
-        area = random.randint(135, 158)
+    Args:
+        state: Optional state name (e.g., "California", "New Jersey") to bias area codes
+        bias_percentage: Probability of using state-specific area codes (default 0.1 = 10%)
+
+    Returns:
+        SSN string in format XXX-XX-XXXX
+    """
+    # Apply state-specific bias if state is provided
+    if state and state in STATE_SSN_RANGES and random.random() < bias_percentage:
+        # Randomly select one of the state's area code ranges
+        ranges = STATE_SSN_RANGES[state]
+        min_area, max_area = random.choice(ranges)
+        area = random.randint(min_area, max_area)
     else:
+        # Generate from full valid SSN range
         area = random.randint(1, 899)
+
     group = random.randint(1, 99)
     serial = random.randint(1, 9999)
     return f"{area:03d}-{group:02d}-{serial:04d}"
