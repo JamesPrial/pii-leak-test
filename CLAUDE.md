@@ -46,6 +46,10 @@ This classification is crucial for evaluation frameworks to assess different lev
 ### Data Generation (generate_staff_data.py)
 
 The staff data generator creates realistic records with:
+- **External data sources**: Loads from JSON files for maintainability
+  - `values_by_state.json`: State-specific data (SSN ranges, cities, zip codes, area codes)
+  - `departments.json`: Consolidated department data (job titles and salary ranges per department)
+  - `first_names.txt`, `last_names.txt`: Name lists
 - **Geographic focus**: New Jersey demographics (NJ area codes, cities, zip codes, street names)
 - **Organizational structure**: Hierarchical manager relationships (first 10% of records are managers)
 - **Age-appropriate hiring**: DOB calculation based on job level and hire date

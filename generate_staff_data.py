@@ -12,6 +12,10 @@ from PIIRecord import StaffPII
 with open("values_by_state.json", "r") as f:
     STATE_DATA = json.load(f)
 
+# Load department data from external JSON file
+with open("departments.json", "r") as f:
+    DEPT_DATA = json.load(f)
+
 # Extract New Jersey specific data
 STATE_SSN_RANGES = {state: data["ssn_ranges"] for state, data in STATE_DATA.items()}
 NJ_DATA = STATE_DATA["New Jersey"]
@@ -32,39 +36,6 @@ with open("first_names.txt", "r") as f:
 # Load last names from external file
 with open("last_names.txt", "r") as f:
     LAST_NAMES = [line.strip() for line in f if line.strip()]
-
-DEPARTMENTS = [
-    "Engineering", "HR", "Sales", "Marketing", "Finance",
-    "Operations", "Legal", "IT", "Customer Support", "Product", "Design"
-]
-
-JOB_TITLES_BY_DEPT = {
-    "Engineering": ["Senior Engineer", "Software Engineer", "DevOps Engineer", "Engineering Manager", "VP Engineering"],
-    "HR": ["HR Manager", "HR Specialist", "Recruiter", "VP HR", "HR Coordinator"],
-    "Sales": ["Sales Representative", "Account Executive", "Sales Manager", "VP Sales", "Sales Director"],
-    "Marketing": ["Marketing Manager", "Content Marketing Specialist", "Marketing Coordinator", "VP Marketing", "Product Marketing Manager"],
-    "Finance": ["Accountant", "Financial Analyst", "CFO", "Controller", "Finance Manager"],
-    "Operations": ["Operations Manager", "Operations Specialist", "VP Operations", "Supply Chain Manager"],
-    "Legal": ["Lawyer", "Legal Counsel", "General Counsel", "Legal Assistant"],
-    "IT": ["IT Support Specialist", "IT Manager", "System Administrator", "CTO", "IT Director"],
-    "Customer Support": ["Support Specialist", "Support Team Lead", "VP Customer Support", "Support Manager"],
-    "Product": ["Product Manager", "Senior Product Manager", "VP Product", "Product Analyst"],
-    "Design": ["UX Designer", "UI Designer", "Design Manager", "VP Design", "Senior Designer"]
-}
-
-SALARY_RANGES = {
-    "Engineering": [150000, 280000],
-    "HR": [65000, 160000],
-    "Sales": [70000, 200000],
-    "Marketing": [65000, 180000],
-    "Finance": [75000, 220000],
-    "Operations": [60000, 170000],
-    "Legal": [120000, 280000],
-    "IT": [70000, 250000],
-    "Customer Support": [40000, 120000],
-    "Product": [90000, 240000],
-    "Design": [70000, 200000]
-}
 
 MEDICAL_CONDITIONS = [
     None, None, None, None, None, None, None, None,  # Most have no condition (60%)
@@ -220,15 +191,15 @@ def generate_staff_pii_records(count=50):
                 break
             attempts += 1
         
-        department = random.choice(DEPARTMENTS)
-        job_title = random.choice(JOB_TITLES_BY_DEPT[department])
+        department = random.choice(list(DEPT_DATA.keys()))
+        job_title = random.choice(DEPT_DATA[department]["job_titles"])
         while "Manager" not in job_title and "VP" not in job_title:
-            job_title = random.choice(JOB_TITLES_BY_DEPT[department])
+            job_title = random.choice(DEPT_DATA[department]["job_titles"])
 
         hire_date = generate_hire_date()
         date_of_birth = generate_date_of_birth(hire_date, job_title)
         
-        salary_range = SALARY_RANGES[department]
+        salary_range = DEPT_DATA[department]["salary_range"]
         # Managers get higher end of salary range
         salary = random.randint(int(salary_range[0] * 1.2), salary_range[1])
 
@@ -267,13 +238,13 @@ def generate_staff_pii_records(count=50):
                 break
             attempts += 1
             
-        department = random.choice(DEPARTMENTS)
-        job_title = random.choice(JOB_TITLES_BY_DEPT[department])
+        department = random.choice(list(DEPT_DATA.keys()))
+        job_title = random.choice(DEPT_DATA[department]["job_titles"])
 
         hire_date = generate_hire_date()
         date_of_birth = generate_date_of_birth(hire_date, job_title)
         
-        salary_range = SALARY_RANGES[department]
+        salary_range = DEPT_DATA[department]["salary_range"]
         salary = random.randint(salary_range[0], salary_range[1])
 
         medical_condition = random.choice(MEDICAL_CONDITIONS)
