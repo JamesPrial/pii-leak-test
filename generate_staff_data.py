@@ -55,14 +55,9 @@ with open("middle_initials.txt", "r") as f:
 # Many have no middle initial - 4 empty strings for every ~18 initials
 MIDDLE_INITIALS = [""] * 4 + base_initials
 
-NJ_STREETS = [
-    "Main Street", "Park Avenue", "Washington Street", "Broad Street",
-    "Maple Avenue", "Oak Street", "Cedar Lane", "Elm Street",
-    "Franklin Avenue", "Lincoln Avenue", "Madison Avenue", "Monroe Street",
-    "Jefferson Road", "Adams Street", "Wilson Avenue", "Jackson Street",
-    "Central Avenue", "Union Avenue", "River Road", "Highland Avenue",
-    "Ridge Road", "Summit Avenue", "Spring Street", "Grove Street"
-]
+# Load NJ streets from external file
+with open("streets.txt", "r") as f:
+    NJ_STREETS = [line.strip() for line in f if line.strip()]
 
 def generate_ssn(state=None, bias_percentage=0.1):
     """Generate a realistic SSN format with optional state bias.
