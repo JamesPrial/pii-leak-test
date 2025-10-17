@@ -25,25 +25,13 @@ NJ_CITIES = [(city["city"], zip_code)
 # Extract NJ area codes from JSON data
 NJ_AREA_CODES = [int(code) for code in NJ_DATA["area_codes"]]
 
-# Sample data for generating realistic records
-FIRST_NAMES = [
-    "James", "Sarah", "Michael", "Jennifer", "David", "Emily", "Robert", "Jessica",
-    "William", "Amanda", "Richard", "Michelle", "Joseph", "Lisa", "Thomas", "Karen",
-    "Charles", "Nancy", "Christopher", "Maria", "Daniel", "Sandra", "Matthew", "Ashley",
-    "Mark", "Brenda", "Donald", "Stephanie", "Steven", "Catherine", "Paul", "Deborah",
-    "Andrew", "Cheryl", "Joshua", "Carolyn", "Kevin", "Diana", "Brian", "Pamela",
-    "Edward", "Kathleen", "Ronald", "Florence", "Anthony", "Teresa", "Frank", "Gloria",
-    "Ryan", "Sara", "Gary", "Candice", "Nicholas", "Brittany"
-]
+# Load first names from external file
+with open("first_names.txt", "r") as f:
+    FIRST_NAMES = [line.strip() for line in f if line.strip()]
 
-LAST_NAMES = [
-    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-    "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
-    "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
-    "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Young",
-    "Allen", "King", "Wright", "Scott", "Torres", "Peterson", "Phillips", "Campbell",
-    "Parker", "Evans", "Edwards", "Collins", "Reyes", "Stewart", "Morris", "Morales"
-]
+# Load last names from external file
+with open("last_names.txt", "r") as f:
+    LAST_NAMES = [line.strip() for line in f if line.strip()]
 
 DEPARTMENTS = [
     "Engineering", "HR", "Sales", "Marketing", "Finance",
