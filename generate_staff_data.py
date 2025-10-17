@@ -15,8 +15,11 @@ with open("state_ssn_ranges.json", "r") as f:
 # Load cities from external JSON file
 with open("cities.json", "r") as f:
     cities_data = json.load(f)
-    # Convert to list of tuples for compatibility with existing code
-    NJ_CITIES = [(city["city"], city["zip"]) for city in cities_data["New Jersey"]]
+    # Flatten to list of (city, zip) tuples - creates one tuple per zip code
+    # Cities with more zip codes will be proportionally more likely to be selected
+    NJ_CITIES = [(city["city"], zip_code)
+                 for city in cities_data["New Jersey"]
+                 for zip_code in city["zip_codes"]]
 
 # Sample data for generating realistic records
 FIRST_NAMES = [
