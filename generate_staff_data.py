@@ -37,26 +37,27 @@ with open("first_names.txt", "r") as f:
 with open("last_names.txt", "r") as f:
     LAST_NAMES = [line.strip() for line in f if line.strip()]
 
-MEDICAL_CONDITIONS = [
-    None, None, None, None, None, None, None, None,  # Most have no condition (60%)
-    "Type 2 Diabetes", "Hypertension", "High Cholesterol", "Asthma",
-    "Migraines", "Allergies", "Seasonal Allergies", "Anxiety Disorder",
-    "GERD", "Back Pain", "Arthritis", "Sleep Apnea", "Depression",
-    "Hypothyroidism", "Eczema", "Chronic Fatigue", "IBS", "Osteoporosis",
-    "Celiac Disease", "Psoriasis", "Fibromyalgia", "Anemia"
-]
+# Load medical conditions from external file
+with open("medical_conditions.txt", "r") as f:
+    base_conditions = [line.strip() for line in f if line.strip()]
+# Most have no condition (60%) - 8 None values for every ~22 conditions
+MEDICAL_CONDITIONS = [None] * 8 + base_conditions
 
-NAME_SUFFIXES = ["", "", "", "", "", "", "", "", "Jr.", "Sr.", "II", "III"]  # Most have no suffix
-MIDDLE_INITIALS = ["", "", "", "", "A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "J.", "K.", "L.", "M.", "N.", "P.", "R.", "S.", "T.", "W."]
+# Load name suffixes from external file
+with open("name_suffixes.txt", "r") as f:
+    base_suffixes = [line.strip() for line in f if line.strip()]
+# Most have no suffix - 8 empty strings for every ~4 suffixes
+NAME_SUFFIXES = [""] * 8 + base_suffixes
 
-NJ_STREETS = [
-    "Main Street", "Park Avenue", "Washington Street", "Broad Street",
-    "Maple Avenue", "Oak Street", "Cedar Lane", "Elm Street",
-    "Franklin Avenue", "Lincoln Avenue", "Madison Avenue", "Monroe Street",
-    "Jefferson Road", "Adams Street", "Wilson Avenue", "Jackson Street",
-    "Central Avenue", "Union Avenue", "River Road", "Highland Avenue",
-    "Ridge Road", "Summit Avenue", "Spring Street", "Grove Street"
-]
+# Load middle initials from external file
+with open("middle_initials.txt", "r") as f:
+    base_initials = [line.strip() for line in f if line.strip()]
+# Many have no middle initial - 4 empty strings for every ~18 initials
+MIDDLE_INITIALS = [""] * 4 + base_initials
+
+# Load NJ streets from external file
+with open("streets.txt", "r") as f:
+    NJ_STREETS = [line.strip() for line in f if line.strip()]
 
 def generate_ssn(state=None, bias_percentage=0.1):
     """Generate a realistic SSN format with optional state bias.
