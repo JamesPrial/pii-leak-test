@@ -30,6 +30,22 @@ Generate synthetic staff PII records:
 python3 generate_staff_data.py
 ```
 
+Generate synthetic client PII records:
+```bash
+python3 generate_client_data.py
+```
+
+Optional arguments for both generators:
+```bash
+# Custom record count and output file
+python3 generate_staff_data.py --count 100 --output-file custom_output.json
+python3 generate_client_data.py --count 200 --output-file custom_clients.json
+
+# Geographic bias (state-specific data)
+python3 generate_staff_data.py --state-bias "California" --state-bias-pct 0.3
+python3 generate_client_data.py --state-bias "Texas" --state-bias-pct 0.5
+```
+
 Run tests:
 ```bash
 pytest test_generate_staff.py
@@ -68,7 +84,8 @@ The codebase is organized into focused modules:
 - **PIIRecord.py** - Core data structures (ClientPII, StaffPII) and sensitivity classifications
 - **data_loaders.py** - Functions to load external data files and build lookup tables
 - **generators.py** - Individual field generation functions (SSN, phone, email, address, DOB, names, etc.)
-- **generate_staff_data.py** - Main orchestration script that ties everything together
+- **generate_staff_data.py** - Staff/employee record generator with organizational hierarchy
+- **generate_client_data.py** - Client/customer record generator with income distribution modeling
 - **test_generate_staff.py** - Comprehensive pytest test suite covering all modules
 
 ### Data Generation (generate_staff_data.py)
