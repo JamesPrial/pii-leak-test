@@ -132,7 +132,7 @@ def generate_email(first_name, last_name, domain="company.com"):
     random_digits = random.randint(100, 999999)  # Generates 3-6 digit number
     return f"{first_name.lower()}{last_initial}{random_digits}@{domain}"
 
-def get_state_abbreviation(state):
+def get_state_abbreviation(state: str):
     """Get the state abbreviation for a given state name.
 
     Args:
@@ -140,11 +140,15 @@ def get_state_abbreviation(state):
 
     Returns:
         Two-letter state abbreviation (e.g., "CA", "NJ")
-        Defaults to "NJ" if state is None or not found
+        
+    Raises: 
+        ValueError: If state name is not found in STATE_ABBREVIATIONS
+
     """
-    if state is None:
-        return "NJ"
-    return STATE_ABBREVIATIONS.get(state, "NJ")
+    abbrev = STATE_ABBREVIATIONS.get(state, None)
+    if abbrev is None:
+        raise ValueError(f"State '{state}' not found in STATE_ABBREVIATIONS")
+    return abbrev
 
 def generate_address(state=None, bias_percentage=0.1):
     """Generate an address with optional state bias and apartment/suite numbers.
