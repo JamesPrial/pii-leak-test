@@ -108,8 +108,14 @@ Main orchestration function (generate_staff_data.py):
 ## Data Files
 
 ### Input Data (`data/` directory)
+
+The data directory is organized into two subdirectories:
+
+**`data/reference/`** - Structured configuration (rarely edited):
 - `state_reference_data.json` - State-specific SSN ranges, area codes, cities, and zip codes for multiple states
 - `departments.json` - Department data including job titles, salary ranges by seniority level, seniority distributions, and global config (probability distributions for medical conditions, name suffixes, middle initials, addresses, hire dates, age ranges)
+
+**`data/sources/`** - User-editable value lists (frequently updated):
 - `first_names.txt`, `last_names.txt` - Name lists for generating full names
 - `medical_conditions.txt`, `streets.txt`, `name_suffixes.txt`, `middle_initials.txt` - Additional data lists
 
