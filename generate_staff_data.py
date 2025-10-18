@@ -49,14 +49,6 @@ STREETS = streets
 NJ_STREETS = STREETS  # Backward compatibility
 
 
-
-    
-
-def generate_unique_full_name(used_names):
-    """Generate a unique full name, ensuring no duplicates."""
-    return generate_full_name(FIRST_NAMES, LAST_NAMES, MIDDLE_INITIALS, NAME_SUFFIXES, used_names)
-
-
 def generate_employee_details(department, seniority_level, is_manager, dist_config, dept_data, MEDICAL_CONDITIONS):
     """Generate common employee details: hire date, DOB, salary, medical condition."""
     hire_date = generate_hire_date(dist_config)
@@ -112,9 +104,6 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
         List of StaffPII records
     """
     logger.info(f"Generating {count} staff PII records...")
-    # Default to New Jersey for backward compatibility
-    if state_bias is None:
-        state_bias = "New Jersey"
 
     records = []
     managers = []
@@ -128,7 +117,7 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     manager_count = min(max(1, count // 10), count)
     logger.info(f"Creating {manager_count} manager records...")
     for i in range(manager_count):
-        first_name, last_name, full_name = generate_unique_full_name(used_names)
+        first_name, last_name, full_name = generate_full_name(FIRST_NAMES, LAST_NAMES, MIDDLE_INITIALS, NAME_SUFFIXES, used_names)
 
         # Select department (excluding global_config key)
         dept_names = [k for k in dept_data.keys() if k != "global_config"]
@@ -145,7 +134,7 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     remaining_count = count - manager_count
     logger.info(f"Creating {remaining_count} employee records...")
     for i in range(manager_count, count):
-        first_name, last_name, full_name = generate_unique_full_name(used_names)
+        first_name, last_name, full_name = generate_full_name(FIRST_NAMES, LAST_NAMES, MIDDLE_INITIALS, NAME_SUFFIXES, used_names)
 
         # Select department (excluding global_config key)
         dept_names = [k for k in dept_data.keys() if k != "global_config"]
