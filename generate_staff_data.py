@@ -227,6 +227,26 @@ def generate_hire_date(start_year=None, end_year=None, recent_bias=None):
     random_date = start_date + timedelta(days=days_offset)
     return random_date.strftime("%Y-%m-%d")
 
+def select_seniority_level(is_manager=False):
+    """Select a seniority level from junior/senior/management/executive.
+
+    Args:
+        is_manager: If True, bias toward management/executive levels
+
+    Returns:
+        String: One of "junior", "senior", "management", "executive"
+    """
+    if is_manager:
+        # Managers should be from management or executive levels
+        return random.choice(["management", "executive"])
+    else:
+        # Regular employees can be any level, with realistic distribution
+        # Weight toward senior (40%), junior (30%), management (20%), executive (10%)
+        return random.choices(
+            ["junior", "senior", "management", "executive"],
+            weights=[30, 40, 20, 10]
+        )[0]
+
 def generate_date_of_birth(hire_date_str, job_title, age_config=None):
     """Generate a date of birth that makes sense with hire date and job level.
 
@@ -317,19 +337,20 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
             attempts += 1
         
         department = random.choice(list(DEPT_DATA.keys()))
-        job_title = random.choice(DEPT_DATA[department]["job_titles"])
-        # Try to find a Manager/VP title, but give up after 50 attempts to avoid infinite loops
-        attempts_mgr = 0
-        while "Manager" not in job_title and "VP" not in job_title and attempts_mgr < 50:
-            job_title = random.choice(DEPT_DATA[department]["job_titles"])
-            attempts_mgr += 1
+
+        # Select a management or executive level for managers
+        seniority_level = select_seniority_level(is_manager=True)
+        job_title = random.choice(DEPT_DATA[department][seniority_level]["job_titles"])
 
         hire_date = generate_hire_date()
         date_of_birth = generate_date_of_birth(hire_date, job_title)
-        
-        salary_range = DEPT_DATA[department]["salary_range"]
-        # Managers get higher end of salary range
-        salary = random.randint(int(salary_range[0] * 1.2), salary_range[1])
+
+        # Use seniority-specific salary range
+        salary_range = DEPT_DATA[department][seniority_level]["salary_range"]
+        # Managers get higher end of salary range (upper 80% of range)
+        range_size = salary_range[1] - salary_range[0]
+        min_salary = int(salary_range[0] + range_size * 0.2)
+        salary = random.randint(min_salary, salary_range[1])
 
         medical_condition = random.choice(MEDICAL_CONDITIONS)
         
@@ -365,14 +386,18 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
                 used_names.add(full_name)
                 break
             attempts += 1
-            
+
         department = random.choice(list(DEPT_DATA.keys()))
-        job_title = random.choice(DEPT_DATA[department]["job_titles"])
+
+        # Select a seniority level for regular employees
+        seniority_level = select_seniority_level(is_manager=False)
+        job_title = random.choice(DEPT_DATA[department][seniority_level]["job_titles"])
 
         hire_date = generate_hire_date()
         date_of_birth = generate_date_of_birth(hire_date, job_title)
-        
-        salary_range = DEPT_DATA[department]["salary_range"]
+
+        # Use seniority-specific salary range
+        salary_range = DEPT_DATA[department][seniority_level]["salary_range"]
         salary = random.randint(salary_range[0], salary_range[1])
 
         medical_condition = random.choice(MEDICAL_CONDITIONS)

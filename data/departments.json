@@ -1,108 +1,311 @@
 {
   "Engineering": {
-    "job_titles": [
-      "Senior Engineer",
-      "Software Engineer",
-      "DevOps Engineer",
-      "Engineering Manager",
-      "VP Engineering"
-    ],
-    "salary_range": [150000, 280000]
+    "junior": {
+      "job_titles": [
+        "Junior Engineer",
+        "Junior Software Engineer"
+      ],
+      "salary_range": [150000, 182000]
+    },
+    "senior": {
+      "job_titles": [
+        "Software Engineer",
+        "Senior Engineer",
+        "DevOps Engineer"
+      ],
+      "salary_range": [182000, 214000]
+    },
+    "management": {
+      "job_titles": [
+        "Engineering Manager"
+      ],
+      "salary_range": [214000, 247000]
+    },
+    "executive": {
+      "job_titles": [
+        "VP Engineering"
+      ],
+      "salary_range": [247000, 280000]
+    }
   },
   "HR": {
-    "job_titles": [
-      "HR Manager",
-      "HR Specialist",
-      "Recruiter",
-      "VP HR",
-      "HR Coordinator"
-    ],
-    "salary_range": [65000, 160000]
+    "junior": {
+      "job_titles": [
+        "HR Coordinator",
+        "Junior HR Specialist"
+      ],
+      "salary_range": [65000, 88750]
+    },
+    "senior": {
+      "job_titles": [
+        "HR Specialist",
+        "Recruiter"
+      ],
+      "salary_range": [88750, 112500]
+    },
+    "management": {
+      "job_titles": [
+        "HR Manager"
+      ],
+      "salary_range": [112500, 136250]
+    },
+    "executive": {
+      "job_titles": [
+        "VP HR"
+      ],
+      "salary_range": [136250, 160000]
+    }
   },
   "Sales": {
-    "job_titles": [
-      "Sales Representative",
-      "Account Executive",
-      "Sales Manager",
-      "VP Sales",
-      "Sales Director"
-    ],
-    "salary_range": [70000, 200000]
+    "junior": {
+      "job_titles": [
+        "Junior Sales Representative"
+      ],
+      "salary_range": [70000, 102500]
+    },
+    "senior": {
+      "job_titles": [
+        "Sales Representative",
+        "Account Executive"
+      ],
+      "salary_range": [102500, 135000]
+    },
+    "management": {
+      "job_titles": [
+        "Sales Manager",
+        "Sales Director"
+      ],
+      "salary_range": [135000, 167500]
+    },
+    "executive": {
+      "job_titles": [
+        "VP Sales"
+      ],
+      "salary_range": [167500, 200000]
+    }
   },
   "Marketing": {
-    "job_titles": [
-      "Marketing Manager",
-      "Content Marketing Specialist",
-      "Marketing Coordinator",
-      "VP Marketing",
-      "Product Marketing Manager"
-    ],
-    "salary_range": [65000, 180000]
+    "junior": {
+      "job_titles": [
+        "Marketing Coordinator",
+        "Junior Marketing Specialist"
+      ],
+      "salary_range": [65000, 93750]
+    },
+    "senior": {
+      "job_titles": [
+        "Content Marketing Specialist",
+        "Marketing Specialist"
+      ],
+      "salary_range": [93750, 122500]
+    },
+    "management": {
+      "job_titles": [
+        "Marketing Manager",
+        "Product Marketing Manager"
+      ],
+      "salary_range": [122500, 151250]
+    },
+    "executive": {
+      "job_titles": [
+        "VP Marketing"
+      ],
+      "salary_range": [151250, 180000]
+    }
   },
   "Finance": {
-    "job_titles": [
-      "Accountant",
-      "Financial Analyst",
-      "CFO",
-      "Controller",
-      "Finance Manager"
-    ],
-    "salary_range": [75000, 220000]
+    "junior": {
+      "job_titles": [
+        "Junior Accountant",
+        "Junior Financial Analyst"
+      ],
+      "salary_range": [75000, 111250]
+    },
+    "senior": {
+      "job_titles": [
+        "Accountant",
+        "Financial Analyst"
+      ],
+      "salary_range": [111250, 147500]
+    },
+    "management": {
+      "job_titles": [
+        "Finance Manager",
+        "Controller"
+      ],
+      "salary_range": [147500, 183750]
+    },
+    "executive": {
+      "job_titles": [
+        "CFO"
+      ],
+      "salary_range": [183750, 220000]
+    }
   },
   "Operations": {
-    "job_titles": [
-      "Operations Manager",
-      "Operations Specialist",
-      "VP Operations",
-      "Supply Chain Manager"
-    ],
-    "salary_range": [60000, 170000]
+    "junior": {
+      "job_titles": [
+        "Junior Operations Specialist"
+      ],
+      "salary_range": [60000, 87500]
+    },
+    "senior": {
+      "job_titles": [
+        "Operations Specialist"
+      ],
+      "salary_range": [87500, 115000]
+    },
+    "management": {
+      "job_titles": [
+        "Operations Manager",
+        "Supply Chain Manager"
+      ],
+      "salary_range": [115000, 142500]
+    },
+    "executive": {
+      "job_titles": [
+        "VP Operations"
+      ],
+      "salary_range": [142500, 170000]
+    }
   },
   "Legal": {
-    "job_titles": [
-      "Lawyer",
-      "Legal Counsel",
-      "General Counsel",
-      "Legal Assistant"
-    ],
-    "salary_range": [120000, 280000]
+    "junior": {
+      "job_titles": [
+        "Legal Assistant",
+        "Paralegal"
+      ],
+      "salary_range": [120000, 160000]
+    },
+    "senior": {
+      "job_titles": [
+        "Lawyer",
+        "Legal Counsel"
+      ],
+      "salary_range": [160000, 200000]
+    },
+    "management": {
+      "job_titles": [
+        "Senior Legal Counsel"
+      ],
+      "salary_range": [200000, 240000]
+    },
+    "executive": {
+      "job_titles": [
+        "General Counsel"
+      ],
+      "salary_range": [240000, 280000]
+    }
   },
   "IT": {
-    "job_titles": [
-      "IT Support Specialist",
-      "IT Manager",
-      "System Administrator",
-      "CTO",
-      "IT Director"
-    ],
-    "salary_range": [70000, 250000]
+    "junior": {
+      "job_titles": [
+        "Junior IT Support Specialist"
+      ],
+      "salary_range": [70000, 115000]
+    },
+    "senior": {
+      "job_titles": [
+        "IT Support Specialist",
+        "System Administrator"
+      ],
+      "salary_range": [115000, 160000]
+    },
+    "management": {
+      "job_titles": [
+        "IT Manager",
+        "IT Director"
+      ],
+      "salary_range": [160000, 205000]
+    },
+    "executive": {
+      "job_titles": [
+        "CTO"
+      ],
+      "salary_range": [205000, 250000]
+    }
   },
   "Customer Support": {
-    "job_titles": [
-      "Support Specialist",
-      "Support Team Lead",
-      "VP Customer Support",
-      "Support Manager"
-    ],
-    "salary_range": [40000, 120000]
+    "junior": {
+      "job_titles": [
+        "Junior Support Specialist"
+      ],
+      "salary_range": [40000, 60000]
+    },
+    "senior": {
+      "job_titles": [
+        "Support Specialist"
+      ],
+      "salary_range": [60000, 80000]
+    },
+    "management": {
+      "job_titles": [
+        "Support Team Lead",
+        "Support Manager"
+      ],
+      "salary_range": [80000, 100000]
+    },
+    "executive": {
+      "job_titles": [
+        "VP Customer Support"
+      ],
+      "salary_range": [100000, 120000]
+    }
   },
   "Product": {
-    "job_titles": [
-      "Product Manager",
-      "Senior Product Manager",
-      "VP Product",
-      "Product Analyst"
-    ],
-    "salary_range": [90000, 240000]
+    "junior": {
+      "job_titles": [
+        "Junior Product Analyst",
+        "Product Analyst"
+      ],
+      "salary_range": [90000, 127500]
+    },
+    "senior": {
+      "job_titles": [
+        "Product Manager",
+        "Senior Product Manager"
+      ],
+      "salary_range": [127500, 165000]
+    },
+    "management": {
+      "job_titles": [
+        "Director of Product"
+      ],
+      "salary_range": [165000, 202500]
+    },
+    "executive": {
+      "job_titles": [
+        "VP Product"
+      ],
+      "salary_range": [202500, 240000]
+    }
   },
   "Design": {
-    "job_titles": [
-      "UX Designer",
-      "UI Designer",
-      "Design Manager",
-      "VP Design",
-      "Senior Designer"
-    ],
-    "salary_range": [70000, 200000]
+    "junior": {
+      "job_titles": [
+        "Junior Designer"
+      ],
+      "salary_range": [70000, 102500]
+    },
+    "senior": {
+      "job_titles": [
+        "UX Designer",
+        "UI Designer",
+        "Senior Designer"
+      ],
+      "salary_range": [102500, 135000]
+    },
+    "management": {
+      "job_titles": [
+        "Design Manager"
+      ],
+      "salary_range": [135000, 167500]
+    },
+    "executive": {
+      "job_titles": [
+        "VP Design"
+      ],
+      "salary_range": [167500, 200000]
+    }
   }
 }
