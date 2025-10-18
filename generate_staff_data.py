@@ -285,19 +285,30 @@ def generate_date_of_birth(hire_date_str, job_title, age_config=None):
 
     return datetime(birth_year, birth_month, birth_day).strftime("%Y-%m-%d")
 
-def generate_full_name(first_name, last_name):
+def generate_full_name(used_names):
     """Generate a full name with optional middle initial and suffix."""
-    middle = random.choice(MIDDLE_INITIALS)
-    suffix = random.choice(NAME_SUFFIXES)
+    attempts = 0
+    while attempts < 100:
+        first_name = random.choice(FIRST_NAMES)
+        last_name = random.choice(LAST_NAMES)
+        
+        middle = random.choice(MIDDLE_INITIALS)
+        suffix = random.choice(NAME_SUFFIXES)
+        if middle and suffix:
+            full_name =f"{first_name} {middle} {last_name} {suffix}"
+        elif middle:
+            full_name =f"{first_name} {middle} {last_name}"
+        elif suffix:
+            full_name= f"{first_name} {last_name} {suffix}"
+        else:
+            full_name =f"{first_name} {last_name}"
+        if full_name not in used_names:
+            used_names.add(full_name)
+            return first_name, last_name, full_name
+        attempts += 1
+    raise ValueError("Failed to generate unique name after 100 attempts")
+
     
-    if middle and suffix:
-        return f"{first_name} {middle} {last_name} {suffix}"
-    elif middle:
-        return f"{first_name} {middle} {last_name}"
-    elif suffix:
-        return f"{first_name} {last_name} {suffix}"
-    else:
-        return f"{first_name} {last_name}"
 
 def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     """Generate realistic staff PII records with configurable distributions.
@@ -326,16 +337,8 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     manager_count = min(max(1, count // 10), count)
     for i in range(manager_count):
         # Ensure unique names
-        attempts = 0
-        while attempts < 100:
-            first_name = random.choice(FIRST_NAMES)
-            last_name = random.choice(LAST_NAMES)
-            full_name = generate_full_name(first_name, last_name)
-            if full_name not in used_names:
-                used_names.add(full_name)
-                break
-            attempts += 1
-        
+        first_name, last_name, full_name = generate_full_name(used_names)
+
         # Select department (excluding global_config key)
         dept_names = [k for k in DEPT_DATA.keys() if k != "global_config"]
         department = random.choice(dept_names)
@@ -379,15 +382,8 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     # Create remaining employees with manager assignments
     for i in range(manager_count, count):
         # Ensure unique names
-        attempts = 0
-        while attempts < 100:
-            first_name = random.choice(FIRST_NAMES)
-            last_name = random.choice(LAST_NAMES)
-            full_name = generate_full_name(first_name, last_name)
-            if full_name not in used_names:
-                used_names.add(full_name)
-                break
-            attempts += 1
+        first_name, last_name, full_name = generate_full_name(used_names)
+
 
         # Select department (excluding global_config key)
         dept_names = [k for k in DEPT_DATA.keys() if k != "global_config"]
