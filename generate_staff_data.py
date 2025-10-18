@@ -4,6 +4,7 @@ Generate realistic staff PII records for testing purposes.
 Refactored for better modularity and readability.
 """
 
+import argparse
 import json
 import logging
 import random
@@ -152,19 +153,40 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     return records
 
 def main():
-    """Generate staff records and write to JSON file."""
+    """Generate staff records and write to JSON file with CLI argument support."""
+    parser = argparse.ArgumentParser(
+        description="Generate realistic staff PII records for testing purposes."
+    )
+    parser.add_argument(
+        "-c", "--count",
+        type=int,
+        default=50,
+        help="Number of staff records to generate (default: 50)"
+    )
+    parser.add_argument(
+        "-o", "--output-file",
+        type=str,
+        default="outputs/test_staff_records.json",
+        help="Output file path for generated records (default: outputs/test_staff_records.json)"
+    )
+
+    args = parser.parse_args()
+
     logger.info("Starting staff PII record generation...")
-    records = generate_staff_pii_records(50)
+    records = generate_staff_pii_records(args.count)
 
     # Convert records to dictionaries
     records_dict = [record.to_dict() for record in records]
 
-    # Write to JSON file in outputs directory
-    output_file = "outputs/test_staff_records.json"
-    with open(output_file, "w") as f:
+    # Ensure output directory exists
+    output_path = Path(args.output_file)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Write to JSON file
+    with open(args.output_file, "w") as f:
         json.dump(records_dict, f, indent=2)
 
-    logger.info(f"Successfully generated {len(records)} staff records and written to {output_file}")
+    logger.info(f"Successfully generated {len(records)} staff records and written to {args.output_file}")
     logger.info("Sample record:")
     logger.info(json.dumps(records_dict[0], indent=2))
 
