@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from PIIRecord import StaffPII
 
 # Load consolidated state data from external JSON file
-with open("data/values_by_state.json", "r") as f:
+with open("data/state_reference_data.json", "r") as f:
     STATE_DATA = json.load(f)
 
 # Load department data from external JSON file (now includes global_config)

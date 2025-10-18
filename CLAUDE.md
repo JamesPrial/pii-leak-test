@@ -53,7 +53,7 @@ This classification is crucial for evaluation frameworks to assess different lev
 
 The staff data generator creates realistic records with:
 - **External data sources**: Loads from JSON files for maintainability
-  - `values_by_state.json`: State-specific data (SSN ranges, cities, zip codes, area codes) for multiple states
+  - `state_reference_data.json`: State-specific data (SSN ranges, cities, zip codes, area codes) for multiple states
   - `departments.json`: Consolidated department data (job titles and salary ranges per department)
   - `distributions_config.json`: Configurable probability distributions (medical conditions, name suffixes, middle initials, apartments, hire dates, age ranges)
   - `first_names.txt`, `last_names.txt`: Name lists
@@ -82,7 +82,7 @@ Key generation functions:
 ## Data Files
 
 ### Input Data (`data/` directory)
-- `values_by_state.json` - State-specific SSN ranges, area codes, cities, and zip codes
+- `state_reference_data.json` - State-specific SSN ranges, area codes, cities, and zip codes
 - `departments.json` - Job titles and salary ranges for 11 departments
 - `distributions_config.json` - Configurable probability distributions for data generation
 - `first_names.txt`, `last_names.txt` - Name lists
