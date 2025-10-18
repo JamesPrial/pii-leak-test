@@ -36,10 +36,6 @@ STATE_CITIES = {
     for state, data in STATE_DATA.items()
 }
 
-# For backward compatibility and default NJ focus
-NJ_DATA = STATE_DATA["New Jersey"]
-NJ_CITIES = STATE_CITIES["New Jersey"]
-NJ_AREA_CODES = STATE_AREA_CODES["New Jersey"]
 
 # Build list of all area codes from all states (for fallback)
 ALL_AREA_CODES = [code for codes in STATE_AREA_CODES.values() for code in codes]
@@ -168,9 +164,11 @@ def generate_address(state=None, bias_percentage=0.1):
         city, zipcode = random.choice(STATE_CITIES[state])
         state_abbrev = get_state_abbreviation(state)
     else:
-        # Default to NJ for backward compatibility
-        city, zipcode = random.choice(NJ_CITIES)
-        state_abbrev = "NJ"
+        state = random.choice(STATE_DATA.keys())
+        state_abbrev = get_state_abbreviation(state)
+        cities_and_zips = STATE_CITIES.get(state_abbrev, ALL_CITIES)
+        city, zipcode = random.choice(cities_and_zips)
+        
 
     # Use configured apartment probability
     apt_prob = DIST_CONFIG["address"]["apartment_probability"]
