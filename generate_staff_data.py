@@ -120,12 +120,14 @@ def generate_phone(state=None, bias_percentage=0.1):
     if state and state in STATE_AREA_CODES and random.random() < bias_percentage:
         area_code = random.choice(STATE_AREA_CODES[state])
     else:
-        # Default to NJ for backward compatibility (or use random state)
-        area_code = random.choice(NJ_AREA_CODES)
+        area_code = random.choice(ALL_AREA_CODES)
 
     exchange = random.randint(200, 999)  # Avoid 555
     if exchange == 555:
-        exchange = random.randint(200, 554)
+        if random.random() < 0.5:
+            exchange = random.randint(200, 554)
+        else:
+            exchange = random.randint(556, 999)
     number = random.randint(1000, 9999)
     return f"{area_code}-{exchange}-{number:04d}"
 
