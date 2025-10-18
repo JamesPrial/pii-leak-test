@@ -1,314 +1,54 @@
 #!/usr/bin/env python3
 """
 Generate realistic staff PII records for testing purposes.
+Refactored for better modularity and readability.
 """
 
 import json
+import logging
 import random
-from datetime import datetime, timedelta
+from pathlib import Path
 from PIIRecord import StaffPII
+from data_loaders import load_state_data, load_department_data, load_names_and_conditions, load_streets
+from generators import (
+    generate_ssn, generate_phone, generate_email, get_state_abbreviation, generate_address,
+    generate_bank_account, generate_routing_number, generate_hire_date, select_seniority_level,
+    generate_date_of_birth, generate_full_name
+)
 
-# Load consolidated state data from external JSON file
-with open("data/state_reference_data.json", "r") as f:
-    STATE_DATA = json.load(f)
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-# Load department data from external JSON file (now includes global_config)
-with open("data/departments.json", "r") as f:
-    DEPT_DATA = json.load(f)
+# Define data directory
+DATA_DIR = Path("data")
 
-# Extract global configuration from departments data
-DIST_CONFIG = DEPT_DATA["global_config"]
+# Load all data using modular loaders
+logger.info("Loading data files...")
+state_data_dict = load_state_data(DATA_DIR)
+dept_data, dist_config = load_department_data(DATA_DIR)
+names_dict = load_names_and_conditions(DATA_DIR, dist_config)
+streets = load_streets(DATA_DIR)
 
-# Extract state-specific data
-STATE_SSN_RANGES = {state: data["ssn_ranges"] for state, data in STATE_DATA.items()}
-STATE_ABBREVIATIONS = {state: data["state_abbrev"] for state, data in STATE_DATA.items()}
+# Unpack loaded data for easy access
+STATE_DATA = state_data_dict["state_data"]
+STATE_SSN_RANGES = state_data_dict["state_ssn_ranges"]
+STATE_ABBREVIATIONS = state_data_dict["state_abbreviations"]
+STATE_AREA_CODES = state_data_dict["state_area_codes"]
+STATE_CITIES = state_data_dict["state_cities"]
+ALL_AREA_CODES = state_data_dict["all_area_codes"]
+ALL_CITIES = state_data_dict["all_cities"]
 
-# Build state-specific lookup tables for area codes and cities
-STATE_AREA_CODES = {
-    state: [int(code) for code in data["area_codes"]]
-    for state, data in STATE_DATA.items()
-}
+FIRST_NAMES = names_dict["first_names"]
+LAST_NAMES = names_dict["last_names"]
+MEDICAL_CONDITIONS = names_dict["medical_conditions"]
+NAME_SUFFIXES = names_dict["name_suffixes"]
+MIDDLE_INITIALS = names_dict["middle_initials"]
 
-STATE_CITIES = {
-    state: [(city["city"], zip_code)
-            for city in data["cities"]
-            for zip_code in city["zip_codes"]]
-    for state, data in STATE_DATA.items()
-}
+STREETS = streets
+NJ_STREETS = STREETS  # Backward compatibility
 
 
-# Build list of all area codes from all states (for fallback)
-ALL_AREA_CODES = [code for codes in STATE_AREA_CODES.values() for code in codes]
-
-# Build list of all cities from all states (for fallback)
-ALL_CITIES = [(city, state_name) for state_name, cities in STATE_CITIES.items() for city in cities]
-
-# Load first names from external file
-with open("data/first_names.txt", "r") as f:
-    FIRST_NAMES = [line.strip() for line in f if line.strip()]
-
-# Load last names from external file
-with open("data/last_names.txt", "r") as f:
-    LAST_NAMES = [line.strip() for line in f if line.strip()]
-
-# Load medical conditions from external file
-with open("data/medical_conditions.txt", "r") as f:
-    base_conditions = [line.strip() for line in f if line.strip()]
-# Use distribution config for medical conditions
-med_config = DIST_CONFIG["medical_conditions"]
-MEDICAL_CONDITIONS = [None] * med_config["none_weight"] + base_conditions * med_config["condition_weight"]
-
-# Load name suffixes from external file
-with open("data/name_suffixes.txt", "r") as f:
-    base_suffixes = [line.strip() for line in f if line.strip()]
-# Use distribution config for suffixes
-suffix_config = DIST_CONFIG["name_suffixes"]
-NAME_SUFFIXES = [""] * suffix_config["none_weight"] + base_suffixes * suffix_config["suffix_weight"]
-
-# Load middle initials from external file
-with open("data/middle_initials.txt", "r") as f:
-    base_initials = [line.strip() for line in f if line.strip()]
-# Use distribution config for middle initials
-initial_config = DIST_CONFIG["middle_initials"]
-MIDDLE_INITIALS = [""] * initial_config["none_weight"] + base_initials * initial_config["initial_weight"]
-
-# Load NJ streets from external file (used as default for all states currently)
-with open("data/streets.txt", "r") as f:
-    STREETS = [line.strip() for line in f if line.strip()]
-    NJ_STREETS = STREETS  # Backward compatibility
-
-def generate_ssn(state=None, bias_percentage=0.1):
-    """Generate a realistic SSN format with optional state bias.
-
-    Args:
-        state: Optional state name (e.g., "California", "New Jersey") to bias area codes
-        bias_percentage: Probability of using state-specific area codes (default 0.1 = 10%)
-
-    Returns:
-        SSN string in format XXX-XX-XXXX
-    """
-    # Apply state-specific bias if state is provided
-    if state and state in STATE_SSN_RANGES and random.random() < bias_percentage:
-        # Randomly select one of the state's area code ranges
-        ranges = STATE_SSN_RANGES[state]
-        min_area, max_area = random.choice(ranges)
-        area = random.randint(min_area, max_area)
-    else:
-        # Generate from full valid SSN range
-        area = random.randint(1, 899)
-
-    group = random.randint(1, 99)
-    serial = random.randint(1, 9999)
-    return f"{area:03d}-{group:02d}-{serial:04d}"
-
-def generate_phone(state=None, bias_percentage=0.1):
-    """Generate a realistic phone number with optional state bias.
-
-    Args:
-        state: Optional state name (e.g., "California", "New Jersey") to bias area codes
-        bias_percentage: Probability of using state-specific area codes (default 0.1 = 10%)
-
-    Returns:
-        Phone number string in format XXX-XXX-XXXX
-    """
-    # Apply state-specific bias if state is provided
-    if state and state in STATE_AREA_CODES and random.random() < bias_percentage:
-        area_code = random.choice(STATE_AREA_CODES[state])
-    else:
-        area_code = random.choice(ALL_AREA_CODES)
-
-    exchange = random.randint(200, 999)  # Avoid 555
-    if exchange == 555:
-        if random.random() < 0.5:
-            exchange = random.randint(200, 554)
-        else:
-            exchange = random.randint(556, 999)
-    number = random.randint(1000, 9999)
-    return f"{area_code}-{exchange}-{number:04d}"
-
-def generate_email(first_name, last_name, domain="company.com"):
-    """Generate email in format: {firstname}{last_initial}{3-6_random_ints}@{domain}."""
-    last_initial = last_name[0].lower()
-    random_digits = random.randint(100, 999999)  # Generates 3-6 digit number
-    return f"{first_name.lower()}{last_initial}{random_digits}@{domain}"
-
-def get_state_abbreviation(state: str):
-    """Get the state abbreviation for a given state name.
-
-    Args:
-        state: Full state name (e.g., "California", "New Jersey")
-
-    Returns:
-        Two-letter state abbreviation (e.g., "CA", "NJ")
-        
-    Raises: 
-        ValueError: If state name is not found in STATE_ABBREVIATIONS
-
-    """
-    abbrev = STATE_ABBREVIATIONS.get(state, None)
-    if abbrev is None:
-        raise ValueError(f"State '{state}' not found in STATE_ABBREVIATIONS")
-    return abbrev
-
-def generate_address(state=None, bias_percentage=0.1):
-    """Generate an address with optional state bias and apartment/suite numbers.
-
-    Args:
-        state: Optional state name (e.g., "California", "New Jersey") to bias location
-        bias_percentage: Probability of using state-specific cities (default 0.1 = 10%)
-
-    Returns:
-        Address string with street, optional apt/suite, city, state, zip code
-    """
-    street_num = random.randint(1, 9999)
-    street = random.choice(STREETS)
-
-    # Apply state-specific bias if state is provided
-    if state and state in STATE_CITIES and random.random() < bias_percentage:
-        city, zipcode = random.choice(STATE_CITIES[state])
-        state_abbrev = get_state_abbreviation(state)
-    else:
-        state = random.choice(STATE_DATA.keys())
-        state_abbrev = get_state_abbreviation(state)
-        cities_and_zips = STATE_CITIES.get(state_abbrev, ALL_CITIES)
-        city, zipcode = random.choice(cities_and_zips)
-        
-
-    # Use configured apartment probability
-    apt_prob = DIST_CONFIG["address"]["apartment_probability"]
-    if random.random() < apt_prob:
-        apt_types = ["Apt", "Suite", "Unit"]
-        apt_type = random.choice(apt_types)
-        if apt_type == "Suite":
-            apt_num = random.randint(100, 999)
-        else:
-            apt_num = random.choice([f"{random.randint(1, 20)}{random.choice(['A', 'B', 'C', 'D', ''])}",
-                                     str(random.randint(1, 250))])
-        return f"{street_num} {street}, {apt_type} {apt_num}, {city}, {state_abbrev} {zipcode}"
-
-    return f"{street_num} {street}, {city}, {state_abbrev} {zipcode}"
-
-def generate_bank_account():
-    """Generate a 16-digit bank account number."""
-    return str(random.randint(1000000000000000, 9999999999999999))
-
-def generate_routing_number():
-    """Generate a 9-digit routing number."""
-    return str(random.randint(100000000, 999999999))
-
-def generate_hire_date(start_year=None, end_year=None, recent_bias=None):
-    """Generate a hire date with configurable date range.
-
-    Args:
-        start_year: Start year for hire date range (default from config)
-        end_year: End year for hire date range (default from config)
-        recent_bias: Weight toward recent hires 0.0-1.0 (0=uniform, 1=heavy bias to recent)
-
-    Returns:
-        Hire date string in format YYYY-MM-DD
-    """
-    hire_config = DIST_CONFIG["hire_date"]
-    start_year = start_year or hire_config["default_start_year"]
-    end_year = end_year or hire_config["default_end_year"]
-    recent_bias = recent_bias if recent_bias is not None else hire_config["recent_hire_bias"]
-
-    start_date = datetime(start_year, 1, 1)
-    end_date = datetime(end_year, 12, 31)
-    total_days = (end_date - start_date).days
-
-    if recent_bias > 0:
-        # Apply bias toward more recent dates using power distribution
-        # Higher recent_bias (closer to 1.0) = more weight on recent dates
-        random_factor = random.random() ** (1 / (1 + recent_bias * 3))
-        days_offset = int(total_days * random_factor)
-    else:
-        # Uniform distribution
-        days_offset = random.randint(0, total_days)
-
-    random_date = start_date + timedelta(days=days_offset)
-    return random_date.strftime("%Y-%m-%d")
-
-def select_seniority_level(department, is_manager=False):
-    """Select a seniority level from junior/senior/management/executive.
-
-    Args:
-        department: Department name to get distribution weights from
-        is_manager: If True, bias toward management/executive levels
-
-    Returns:
-        String: One of "junior", "senior", "management", "executive"
-    """
-    if is_manager:
-        # Managers should be from management or executive levels
-        return random.choice(["management", "executive"])
-    else:
-        # Get department-specific seniority distribution weights
-        dist = DEPT_DATA[department]["seniority_distribution"]
-        levels = ["junior", "senior", "management", "executive"]
-        weights = [dist[level] for level in levels]
-
-        return random.choices(levels, weights=weights)[0]
-
-def generate_date_of_birth(hire_date_str, job_title, age_config=None):
-    """Generate a date of birth that makes sense with hire date and job level.
-
-    Args:
-        hire_date_str: Hire date in YYYY-MM-DD format
-        job_title: Job title to determine appropriate age range
-        age_config: Optional dict to override age ranges (defaults to config)
-
-    Returns:
-        Date of birth string in format YYYY-MM-DD
-    """
-    hire_date = datetime.strptime(hire_date_str, "%Y-%m-%d")
-
-    # Use provided age config or default from DIST_CONFIG
-    if age_config is None:
-        age_config = DIST_CONFIG["age_ranges"]
-
-    # Determine minimum age at hire based on job level
-    if any(title in job_title for title in ["VP", "Chief", "CFO", "CTO", "CEO", "General Counsel"]):
-        config = age_config["executive"]
-    elif any(title in job_title for title in ["Senior", "Manager", "Director", "Lead"]):
-        config = age_config["senior"]
-    elif "Coordinator" in job_title or "Assistant" in job_title or "Specialist" in job_title:
-        config = age_config["junior"]
-    else:
-        config = age_config["default"]
-
-    # Calculate age at hire using config ranges
-    min_age_at_hire = random.randint(config["min"], config["max"])
-    age_at_hire = min_age_at_hire + random.randint(0, config["variance"])
-
-    # Calculate birth year
-    birth_year = hire_date.year - age_at_hire
-    birth_month = random.randint(1, 12)
-    birth_day = random.randint(1, 28)  # Safe day for all months
-
-    return datetime(birth_year, birth_month, birth_day).strftime("%Y-%m-%d")
-
-def generate_full_name(used_names):
-    """Generate a full name with optional middle initial and suffix."""
-    attempts = 0
-    while attempts < 100:
-        first_name = random.choice(FIRST_NAMES)
-        last_name = random.choice(LAST_NAMES)
-        
-        middle = random.choice(MIDDLE_INITIALS)
-        suffix = random.choice(NAME_SUFFIXES)
-        if middle and suffix:
-            full_name =f"{first_name} {middle} {last_name} {suffix}"
-        elif middle:
-            full_name =f"{first_name} {middle} {last_name}"
-        elif suffix:
-            full_name= f"{first_name} {last_name} {suffix}"
-        else:
-            full_name =f"{first_name} {last_name}"
-        if full_name not in used_names:
-            used_names.add(full_name)
-            return first_name, last_name, full_name
-        attempts += 1
-    raise ValueError("Failed to generate unique name after 100 attempts")
 
     
 
@@ -323,6 +63,7 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     Returns:
         List of StaffPII records
     """
+    logger.info(f"Generating {count} staff PII records...")
     # Default to New Jersey for backward compatibility
     if state_bias is None:
         state_bias = "New Jersey"
@@ -333,42 +74,43 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
 
     # Generate random employee IDs (not sequential)
     employee_ids = random.sample(range(1000, 1000 + count * 2), count)
-    
+
     # First, create management positions
     # Ensure manager_count doesn't exceed total count
     manager_count = min(max(1, count // 10), count)
+    logger.info(f"Creating {manager_count} manager records...")
     for i in range(manager_count):
         # Ensure unique names
-        first_name, last_name, full_name = generate_full_name(used_names)
+        first_name, last_name, full_name = generate_full_name(FIRST_NAMES, LAST_NAMES, MIDDLE_INITIALS, NAME_SUFFIXES, used_names)
 
         # Select department (excluding global_config key)
-        dept_names = [k for k in DEPT_DATA.keys() if k != "global_config"]
+        dept_names = [k for k in dept_data.keys() if k != "global_config"]
         department = random.choice(dept_names)
 
         # Select a management or executive level for managers
-        seniority_level = select_seniority_level(department, is_manager=True)
-        job_title = random.choice(DEPT_DATA[department][seniority_level]["job_titles"])
+        seniority_level = select_seniority_level(dept_data, department, is_manager=True)
+        job_title = random.choice(dept_data[department][seniority_level]["job_titles"])
 
-        hire_date = generate_hire_date()
+        hire_date = generate_hire_date(dist_config)
         date_of_birth = generate_date_of_birth(hire_date, job_title)
 
         # Use seniority-specific salary range
-        salary_range = DEPT_DATA[department][seniority_level]["salary_range"]
+        salary_range = dept_data[department][seniority_level]["salary_range"]
         # Managers get higher end of salary range (upper 80% of range)
         range_size = salary_range[1] - salary_range[0]
         min_salary = int(salary_range[0] + range_size * 0.2)
         salary = random.randint(min_salary, salary_range[1])
 
         medical_condition = random.choice(MEDICAL_CONDITIONS)
-        
+
         record = StaffPII(
             employee_id=f"EMP{employee_ids[i]}",
             name=full_name,
             email=generate_email(first_name, last_name),
-            phone=generate_phone(state=state_bias, bias_percentage=state_bias_pct),
-            address=generate_address(state=state_bias, bias_percentage=state_bias_pct),
+            phone=generate_phone(STATE_AREA_CODES, ALL_AREA_CODES, state=state_bias, bias_percentage=state_bias_pct),
+            address=generate_address(STREETS, STATE_CITIES, ALL_CITIES, STATE_ABBREVIATIONS, STATE_DATA, dist_config, state=state_bias, bias_percentage=state_bias_pct),
             date_of_birth=date_of_birth,
-            ssn=generate_ssn(state=state_bias, bias_percentage=state_bias_pct),
+            ssn=generate_ssn(STATE_SSN_RANGES, state=state_bias, bias_percentage=state_bias_pct),
             department=department,
             job_title=job_title,
             hire_date=hire_date,
@@ -382,36 +124,37 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
         managers.append(full_name)
 
     # Create remaining employees with manager assignments
+    remaining_count = count - manager_count
+    logger.info(f"Creating {remaining_count} employee records...")
     for i in range(manager_count, count):
         # Ensure unique names
-        first_name, last_name, full_name = generate_full_name(used_names)
-
+        first_name, last_name, full_name = generate_full_name(FIRST_NAMES, LAST_NAMES, MIDDLE_INITIALS, NAME_SUFFIXES, used_names)
 
         # Select department (excluding global_config key)
-        dept_names = [k for k in DEPT_DATA.keys() if k != "global_config"]
+        dept_names = [k for k in dept_data.keys() if k != "global_config"]
         department = random.choice(dept_names)
 
         # Select a seniority level for regular employees
-        seniority_level = select_seniority_level(department, is_manager=False)
-        job_title = random.choice(DEPT_DATA[department][seniority_level]["job_titles"])
+        seniority_level = select_seniority_level(dept_data, department, is_manager=False)
+        job_title = random.choice(dept_data[department][seniority_level]["job_titles"])
 
-        hire_date = generate_hire_date()
+        hire_date = generate_hire_date(dist_config)
         date_of_birth = generate_date_of_birth(hire_date, job_title)
 
         # Use seniority-specific salary range
-        salary_range = DEPT_DATA[department][seniority_level]["salary_range"]
+        salary_range = dept_data[department][seniority_level]["salary_range"]
         salary = random.randint(salary_range[0], salary_range[1])
 
         medical_condition = random.choice(MEDICAL_CONDITIONS)
-        
+
         record = StaffPII(
             employee_id=f"EMP{employee_ids[i]}",
             name=full_name,
             email=generate_email(first_name, last_name),
-            phone=generate_phone(state=state_bias, bias_percentage=state_bias_pct),
-            address=generate_address(state=state_bias, bias_percentage=state_bias_pct),
+            phone=generate_phone(STATE_AREA_CODES, ALL_AREA_CODES, state=state_bias, bias_percentage=state_bias_pct),
+            address=generate_address(STREETS, STATE_CITIES, ALL_CITIES, STATE_ABBREVIATIONS, STATE_DATA, dist_config, state=state_bias, bias_percentage=state_bias_pct),
             date_of_birth=date_of_birth,
-            ssn=generate_ssn(state=state_bias, bias_percentage=state_bias_pct),
+            ssn=generate_ssn(STATE_SSN_RANGES, state=state_bias, bias_percentage=state_bias_pct),
             department=department,
             job_title=job_title,
             hire_date=hire_date,
@@ -425,12 +168,12 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
 
     # Shuffle records to avoid sequential ordering
     random.shuffle(records)
-    
+    logger.info(f"Generated {len(records)} records successfully.")
     return records
 
 def main():
     """Generate staff records and write to JSON file."""
-    print("Generating 50 realistic staff PII records...")
+    logger.info("Starting staff PII record generation...")
     records = generate_staff_pii_records(50)
 
     # Convert records to dictionaries
@@ -441,10 +184,9 @@ def main():
     with open(output_file, "w") as f:
         json.dump(records_dict, f, indent=2)
 
-    print(f"Successfully generated {len(records)} staff records")
-    print(f"Written to {output_file}")
-    print(f"\nSample record:")
-    print(json.dumps(records_dict[0], indent=2))
+    logger.info(f"Successfully generated {len(records)} staff records and written to {output_file}")
+    logger.info("Sample record:")
+    logger.info(json.dumps(records_dict[0], indent=2))
 
 if __name__ == "__main__":
     main()
