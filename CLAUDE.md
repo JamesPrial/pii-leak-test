@@ -26,6 +26,15 @@ Generate synthetic staff PII records:
 python3 generate_staff_data.py
 ```
 
+Run tests:
+```bash
+pytest test_generate_staff.py
+# Or run with verbose output
+pytest test_generate_staff.py -v
+# Run a specific test
+pytest test_generate_staff.py::TestGenerators::test_generate_ssn
+```
+
 ## Architecture
 
 ### Core Data Structures (PIIRecord.py:1-76)
@@ -49,13 +58,21 @@ PII fields are classified into four sensitivity tiers defined in `PII_SENSITIVIT
 
 This classification is crucial for evaluation frameworks to assess different levels of PII leakage.
 
+### Modular Code Structure
+
+The codebase is organized into focused modules:
+- **PIIRecord.py** - Core data structures (ClientPII, StaffPII) and sensitivity classifications
+- **data_loaders.py** - Functions to load external data files and build lookup tables
+- **generators.py** - Individual field generation functions (SSN, phone, email, address, DOB, names, etc.)
+- **generate_staff_data.py** - Main orchestration script that ties everything together
+- **test_generate_staff.py** - Comprehensive pytest test suite covering all modules
+
 ### Data Generation (generate_staff_data.py)
 
 The staff data generator creates realistic records with:
 - **External data sources**: Loads from JSON files for maintainability
   - `state_reference_data.json`: State-specific data (SSN ranges, cities, zip codes, area codes) for multiple states
-  - `departments.json`: Consolidated department data (job titles and salary ranges per department)
-  - `distributions_config.json`: Configurable probability distributions (medical conditions, name suffixes, middle initials, apartments, hire dates, age ranges)
+  - `departments.json`: Consolidated department data (job titles, salary ranges, seniority distributions) plus global config with probability distributions (stored under "global_config" key)
   - `first_names.txt`, `last_names.txt`: Name lists
   - `medical_conditions.txt`, `streets.txt`, `name_suffixes.txt`, `middle_initials.txt`: Additional data lists
 - **Geographic focus**: Defaults to New Jersey demographics but supports multi-state generation with configurable bias
@@ -63,7 +80,7 @@ The staff data generator creates realistic records with:
   - `state_bias_pct` parameter: Controls probability of using state-specific data (0.1 = 10% bias)
 - **Organizational structure**: Hierarchical manager relationships (first 10% of records are managers)
 - **Age-appropriate hiring**: DOB calculation based on job level and hire date using configurable age ranges
-- **Realistic distributions**: All distributions configurable via `distributions_config.json`
+- **Realistic distributions**: All distributions configurable via global_config in `departments.json`
   - Medical conditions: 60% have none (8:1 weight ratio)
   - Name suffixes: ~67% have none (8:1 weight ratio)
   - Middle initials: ~18% have none (4:1 weight ratio)
@@ -71,21 +88,26 @@ The staff data generator creates realistic records with:
   - Hire dates: Configurable date range and recency bias
 - **Non-sequential IDs**: Randomized employee IDs to avoid patterns
 
-Key generation functions:
+Key generation functions (generators.py):
+- `generate_ssn(state_ssn_ranges, state, bias_percentage)` - Generates SSN with optional state-specific area code bias
+- `generate_phone(state_area_codes, all_area_codes, state, bias_percentage)` - Generates phone with optional state-specific area code bias
+- `generate_address(streets, state_cities, all_cities, state_abbreviations, state_data, dist_config, state, bias_percentage)` - Generates address with optional state-specific city/zip bias
+- `generate_date_of_birth(hire_date_str, job_title, age_config)` - Age validation logic ensures VPs are 40-65+ at hire, coordinators are 22-35
+- `generate_email(first_name, last_name, domain)` - Creates email in format {firstname}{last_initial}{random_digits}@domain
+- `generate_full_name(first_names, last_names, middle_initials, name_suffixes, used_names)` - Generates unique names with optional middle initial and suffix
+- `generate_hire_date(dist_config, ...)` - Generates hire dates with optional recent-hire bias
+- `select_seniority_level(dept_data, department, is_manager)` - Selects from junior/senior/management/executive based on department distributions
+
+Main orchestration function (generate_staff_data.py):
 - `generate_staff_pii_records(count, state_bias, state_bias_pct)` - Main entry point, creates manager hierarchy then employees
-- `generate_ssn(state, bias_percentage)` - Generates SSN with optional state-specific area code bias
-- `generate_phone(state, bias_percentage)` - Generates phone with optional state-specific area code bias
-- `generate_address(state, bias_percentage)` - Generates address with optional state-specific city/zip bias
-- `generate_date_of_birth(hire_date_str, job_title, age_config)` - Age validation logic ensures VPs are 35-45+ at hire, coordinators are 22-30
-- Salary ranges vary by department (Customer Support: $40-120K, Engineering: $150-280K)
+- Salary ranges vary by department and seniority level (defined in departments.json)
 
 ## Data Files
 
 ### Input Data (`data/` directory)
-- `state_reference_data.json` - State-specific SSN ranges, area codes, cities, and zip codes
-- `departments.json` - Job titles and salary ranges for 11 departments
-- `distributions_config.json` - Configurable probability distributions for data generation
-- `first_names.txt`, `last_names.txt` - Name lists
+- `state_reference_data.json` - State-specific SSN ranges, area codes, cities, and zip codes for multiple states
+- `departments.json` - Department data including job titles, salary ranges by seniority level, seniority distributions, and global config (probability distributions for medical conditions, name suffixes, middle initials, addresses, hire dates, age ranges)
+- `first_names.txt`, `last_names.txt` - Name lists for generating full names
 - `medical_conditions.txt`, `streets.txt`, `name_suffixes.txt`, `middle_initials.txt` - Additional data lists
 
 ### Output Files (`outputs/` directory)
