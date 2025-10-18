@@ -15,6 +15,7 @@ This is a synthetic PII (Personally Identifiable Information) data generator des
    - Use the git-ops agent to check out a new git worktree from main
    - After finishing your changes, commit them
    - Merge your branch with main
+   - Delete the worktree
    - Delete the branch you created
    - All git operations should be done through the git-ops agent
 
