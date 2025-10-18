@@ -194,5 +194,64 @@ class TestMainLogic:
         nj_addresses = [r for r in records if "NJ" in r.address]
         assert len(nj_addresses) > 0  # At least some should be biased
 
+    def test_output_validation(self):
+        """Test validation of generated output dictionaries."""
+        records = generate_staff_pii_records(10)
+        records_dict = [r.to_dict() for r in records]
+
+        assert len(records_dict) == 10
+
+        # Required fields
+        required_fields = [
+            "employee_id", "name", "email", "phone", "address", "date_of_birth",
+            "ssn", "department", "job_title", "hire_date", "salary",
+            "bank_account_number", "routing_number", "medical_condition"
+        ]
+        manager_field = "manager"
+
+        for record in records_dict:
+            for field in required_fields:
+                assert field in record, f"Missing field: {field}"
+            assert manager_field in record  # Manager can be None
+
+            # Validate formats
+            assert record["employee_id"].startswith("EMP"), "Invalid employee ID format"
+            assert "@company.com" in record["email"], "Invalid email domain"
+            assert len(record["phone"]) == 12 and record["phone"].count('-') == 2, "Invalid phone format"
+            assert len(record["ssn"]) == 11 and record["ssn"].count('-') == 2, "Invalid SSN format"
+            assert len(record["date_of_birth"]) == 10 and record["date_of_birth"].count('-') == 2, "Invalid DOB format"
+            assert len(record["hire_date"]) == 10 and record["hire_date"].count('-') == 2, "Invalid hire date format"
+            assert isinstance(record["salary"], int) and record["salary"] > 0, "Invalid salary"
+            assert len(record["bank_account_number"]) == 16 and record["bank_account_number"].isdigit(), "Invalid bank account"
+            assert len(record["routing_number"]) == 9 and record["routing_number"].isdigit(), "Invalid routing number"
+
+            # Department and job title should be strings
+            assert isinstance(record["department"], str) and record["department"]
+            assert isinstance(record["job_title"], str) and record["job_title"]
+
+            # Medical condition can be None or string
+            assert record["medical_condition"] is None or isinstance(record["medical_condition"], str)
+
+            # Manager should be None for some, string for others
+            assert record["manager"] is None or isinstance(record["manager"], str)
+
+        # Uniqueness checks
+        ids = [r["employee_id"] for r in records_dict]
+        names = [r["name"] for r in records_dict]
+        emails = [r["email"] for r in records_dict]
+        ssns = [r["ssn"] for r in records_dict]
+        phones = [r["phone"] for r in records_dict]
+
+        assert len(set(ids)) == 10, "Employee IDs not unique"
+        assert len(set(names)) == 10, "Names not unique"
+        assert len(set(emails)) == 10, "Emails not unique"
+        assert len(set(ssns)) == 10, "SSNs not unique"
+        assert len(set(phones)) == 10, "Phones not unique"
+
+        # Manager logic: At least one manager, some employees have managers
+        managers = [r["manager"] for r in records_dict if r["manager"] is not None]
+        assert len(managers) > 0, "No managers assigned"
+        assert len(managers) < 10, "All are managers (should have employees)"
+
 if __name__ == "__main__":
     pytest.main([__file__])
