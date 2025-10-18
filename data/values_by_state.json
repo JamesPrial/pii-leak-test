@@ -1,5 +1,6 @@
 {
   "Alabama": {
+    "state_abbrev": "AL",
     "ssn_ranges": [
       [
         416,
@@ -305,6 +306,7 @@
     ]
   },
   "Alaska": {
+    "state_abbrev": "AK",
     "ssn_ranges": [
       [
         574,
@@ -456,6 +458,7 @@
     ]
   },
   "Arizona": {
+    "state_abbrev": "AZ",
     "ssn_ranges": [
       [
         526,
@@ -891,6 +894,7 @@
     ]
   },
   "Arkansas": {
+    "state_abbrev": "AR",
     "ssn_ranges": [
       [
         429,
@@ -1124,6 +1128,7 @@
     ]
   },
   "California": {
+    "state_abbrev": "CA",
     "ssn_ranges": [
       [
         545,
@@ -1291,6 +1296,7 @@
     ]
   },
   "Colorado": {
+    "state_abbrev": "CO",
     "ssn_ranges": [
       [
         521,
@@ -1661,6 +1667,7 @@
     ]
   },
   "Connecticut": {
+    "state_abbrev": "CT",
     "ssn_ranges": [
       [
         40,
@@ -1968,6 +1975,7 @@
     ]
   },
   "Delaware": {
+    "state_abbrev": "DE",
     "ssn_ranges": [
       [
         221,
@@ -2142,6 +2150,7 @@
     ]
   },
   "Florida": {
+    "state_abbrev": "FL",
     "ssn_ranges": [
       [
         261,
@@ -2299,6 +2308,7 @@
     ]
   },
   "Georgia": {
+    "state_abbrev": "GA",
     "ssn_ranges": [
       [
         252,
@@ -2641,6 +2651,7 @@
     ]
   },
   "Hawaii": {
+    "state_abbrev": "HI",
     "ssn_ranges": [
       [
         575,
@@ -2860,6 +2871,7 @@
     ]
   },
   "Idaho": {
+    "state_abbrev": "ID",
     "ssn_ranges": [
       [
         518,
@@ -3005,6 +3017,7 @@
     ]
   },
   "Illinois": {
+    "state_abbrev": "IL",
     "ssn_ranges": [
       [
         318,
@@ -3557,6 +3570,7 @@
     ]
   },
   "Indiana": {
+    "state_abbrev": "IN",
     "ssn_ranges": [
       [
         303,
@@ -3904,6 +3918,7 @@
     ]
   },
   "Iowa": {
+    "state_abbrev": "IA",
     "ssn_ranges": [
       [
         478,
@@ -4159,6 +4174,7 @@
     ]
   },
   "Kansas": {
+    "state_abbrev": "KS",
     "ssn_ranges": [
       [
         509,
@@ -4467,6 +4483,7 @@
     ]
   },
   "Kentucky": {
+    "state_abbrev": "KY",
     "ssn_ranges": [
       [
         400,
@@ -4713,6 +4730,7 @@
     ]
   },
   "Louisiana": {
+    "state_abbrev": "LA",
     "ssn_ranges": [
       [
         433,
@@ -4981,6 +4999,7 @@
     ]
   },
   "Maine": {
+    "state_abbrev": "ME",
     "ssn_ranges": [
       [
         4,
@@ -5153,6 +5172,7 @@
     ]
   },
   "Maryland": {
+    "state_abbrev": "MD",
     "ssn_ranges": [
       [
         212,
@@ -5417,6 +5437,7 @@
     ]
   },
   "Massachusetts": {
+    "state_abbrev": "MA",
     "ssn_ranges": [
       [
         10,
@@ -5708,6 +5729,7 @@
     ]
   },
   "Michigan": {
+    "state_abbrev": "MI",
     "ssn_ranges": [
       [
         362,
@@ -5993,6 +6015,7 @@
     ]
   },
   "Minnesota": {
+    "state_abbrev": "MN",
     "ssn_ranges": [
       [
         468,
@@ -6275,6 +6298,7 @@
     ]
   },
   "Mississippi": {
+    "state_abbrev": "MS",
     "ssn_ranges": [
       [
         425,
@@ -6529,6 +6553,7 @@
     ]
   },
   "Missouri": {
+    "state_abbrev": "MO",
     "ssn_ranges": [
       [
         486,
@@ -6957,6 +6982,7 @@
     ]
   },
   "Montana": {
+    "state_abbrev": "MT",
     "ssn_ranges": [
       [
         516,
@@ -7119,6 +7145,7 @@
     ]
   },
   "Nebraska": {
+    "state_abbrev": "NE",
     "ssn_ranges": [
       [
         505,
@@ -7370,6 +7397,7 @@
     ]
   },
   "Nevada": {
+    "state_abbrev": "NV",
     "ssn_ranges": [
       [
         530,
@@ -7579,6 +7607,7 @@
     ]
   },
   "New Hampshire": {
+    "state_abbrev": "NH",
     "ssn_ranges": [
       [
         1,
@@ -7741,6 +7770,7 @@
     ]
   },
   "New Jersey": {
+    "state_abbrev": "NJ",
     "ssn_ranges": [
       [
         135,
@@ -8171,6 +8201,7 @@
     ]
   },
   "New Mexico": {
+    "state_abbrev": "NM",
     "ssn_ranges": [
       [
         525,
@@ -8372,6 +8403,7 @@
     ]
   },
   "New York": {
+    "state_abbrev": "NY",
     "ssn_ranges": [
       [
         50,
@@ -8955,6 +8987,7 @@
     ]
   },
   "North Carolina": {
+    "state_abbrev": "NC",
     "ssn_ranges": [
       [
         237,
@@ -9377,6 +9410,7 @@
     ]
   },
   "North Dakota": {
+    "state_abbrev": "ND",
     "ssn_ranges": [
       [
         501,
@@ -9566,6 +9600,7 @@
     ]
   },
   "Ohio": {
+    "state_abbrev": "OH",
     "ssn_ranges": [
       [
         268,
@@ -10030,6 +10065,7 @@
     ]
   },
   "Oklahoma": {
+    "state_abbrev": "OK",
     "ssn_ranges": [
       [
         440,
@@ -10384,6 +10420,7 @@
     ]
   },
   "Oregon": {
+    "state_abbrev": "OR",
     "ssn_ranges": [
       [
         540,
@@ -10692,6 +10729,7 @@
     ]
   },
   "Pennsylvania": {
+    "state_abbrev": "PA",
     "ssn_ranges": [
       [
         159,
@@ -11155,6 +11193,7 @@
     ]
   },
   "Rhode Island": {
+    "state_abbrev": "RI",
     "ssn_ranges": [
       [
         35,
@@ -11313,6 +11352,7 @@
     ]
   },
   "South Carolina": {
+    "state_abbrev": "SC",
     "ssn_ranges": [
       [
         247,
@@ -11574,6 +11614,7 @@
     ]
   },
   "South Dakota": {
+    "state_abbrev": "SD",
     "ssn_ranges": [
       [
         503,
@@ -11717,6 +11758,7 @@
     ]
   },
   "Tennessee": {
+    "state_abbrev": "TN",
     "ssn_ranges": [
       [
         408,
@@ -12043,6 +12085,7 @@
     ]
   },
   "Texas": {
+    "state_abbrev": "TX",
     "ssn_ranges": [
       [
         449,
@@ -12206,6 +12249,7 @@
     ]
   },
   "Utah": {
+    "state_abbrev": "UT",
     "ssn_ranges": [
       [
         528,
@@ -12475,6 +12519,7 @@
     ]
   },
   "Vermont": {
+    "state_abbrev": "VT",
     "ssn_ranges": [
       [
         8,
@@ -12605,6 +12650,7 @@
     ]
   },
   "Virginia": {
+    "state_abbrev": "VA",
     "ssn_ranges": [
       [
         223,
@@ -13254,6 +13300,7 @@
     ]
   },
   "Washington": {
+    "state_abbrev": "WA",
     "ssn_ranges": [
       [
         531,
@@ -13609,6 +13656,7 @@
     ]
   },
   "West Virginia": {
+    "state_abbrev": "WV",
     "ssn_ranges": [
       [
         232,
@@ -13770,6 +13818,7 @@
     ]
   },
   "Wisconsin": {
+    "state_abbrev": "WI",
     "ssn_ranges": [
       [
         387,
@@ -14111,6 +14160,7 @@
     ]
   },
   "Wyoming": {
+    "state_abbrev": "WY",
     "ssn_ranges": [
       [
         520,

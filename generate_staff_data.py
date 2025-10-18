@@ -22,6 +22,7 @@ with open("data/distributions_config.json", "r") as f:
 
 # Extract state-specific data
 STATE_SSN_RANGES = {state: data["ssn_ranges"] for state, data in STATE_DATA.items()}
+STATE_ABBREVIATIONS = {state: data["state_abbrev"] for state, data in STATE_DATA.items()}
 
 # Build state-specific lookup tables for area codes and cities
 STATE_AREA_CODES = {
@@ -132,6 +133,20 @@ def generate_email(first_name, last_name):
     """Generate email based on name."""
     return f"{first_name.lower()}.{last_name.lower()}@company.com"
 
+def get_state_abbreviation(state):
+    """Get the state abbreviation for a given state name.
+
+    Args:
+        state: Full state name (e.g., "California", "New Jersey")
+
+    Returns:
+        Two-letter state abbreviation (e.g., "CA", "NJ")
+        Defaults to "NJ" if state is None or not found
+    """
+    if state is None:
+        return "NJ"
+    return STATE_ABBREVIATIONS.get(state, "NJ")
+
 def generate_address(state=None, bias_percentage=0.1):
     """Generate an address with optional state bias and apartment/suite numbers.
 
@@ -148,12 +163,7 @@ def generate_address(state=None, bias_percentage=0.1):
     # Apply state-specific bias if state is provided
     if state and state in STATE_CITIES and random.random() < bias_percentage:
         city, zipcode = random.choice(STATE_CITIES[state])
-        # Get state abbreviation (simple approach - could be externalized)
-        state_abbrev = "NJ" if state == "New Jersey" else \
-                       "CA" if state == "California" else \
-                       "TX" if state == "Texas" else \
-                       "FL" if state == "Florida" else \
-                       "NY" if state == "New York" else "NJ"
+        state_abbrev = get_state_abbreviation(state)
     else:
         # Default to NJ for backward compatibility
         city, zipcode = random.choice(NJ_CITIES)
