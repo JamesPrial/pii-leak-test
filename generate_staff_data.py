@@ -129,9 +129,11 @@ def generate_phone(state=None, bias_percentage=0.1):
     number = random.randint(1000, 9999)
     return f"{area_code}-{exchange}-{number:04d}"
 
-def generate_email(first_name, last_name):
-    """Generate email based on name."""
-    return f"{first_name.lower()}.{last_name.lower()}@company.com"
+def generate_email(first_name, last_name, domain="company.com"):
+    """Generate email in format: {firstname}{last_initial}{3-6_random_ints}@{domain}."""
+    last_initial = last_name[0].lower()
+    random_digits = random.randint(100, 999999)  # Generates 3-6 digit number
+    return f"{first_name.lower()}{last_initial}{random_digits}@{domain}"
 
 def get_state_abbreviation(state):
     """Get the state abbreviation for a given state name.
