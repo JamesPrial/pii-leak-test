@@ -8,6 +8,7 @@ import argparse
 import json
 import logging
 import random
+import uuid
 from pathlib import Path
 from PIIRecord import StaffPII
 from data_loaders import load_state_data, load_department_data, load_names_and_conditions, load_streets
@@ -74,7 +75,7 @@ def create_staff_record(employee_id, first_name, last_name, full_name, departmen
     hire_date, date_of_birth, salary, medical_condition = generate_employee_details(department, seniority_level, is_manager, dist_config, dept_data, MEDICAL_CONDITIONS)
 
     record = StaffPII(
-        employee_id=f"EMP{employee_id}",
+        employee_id=employee_id,
         name=full_name,
         email=generate_email(first_name, last_name),
         phone=generate_phone(STATE_AREA_CODES, ALL_AREA_CODES, state=state_bias, bias_percentage=state_bias_pct),
@@ -110,8 +111,8 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     managers = []
     used_names = set()
 
-    # Generate random employee IDs (not sequential)
-    employee_ids = random.sample(range(1000, 1000 + count * 2), count)
+    # Generate random employee IDs (UUID4)
+    employee_ids = [str(uuid.uuid4()) for _ in range(count)]
 
     # First, create management positions
     # Ensure manager_count doesn't exceed total count

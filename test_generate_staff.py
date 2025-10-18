@@ -4,6 +4,7 @@ Uses pytest for testing data loading, generation functions, and main logic.
 """
 
 import json
+import re
 import pytest
 from pathlib import Path
 from unittest.mock import patch, mock_open
@@ -215,7 +216,9 @@ class TestMainLogic:
             assert manager_field in record  # Manager can be None
 
             # Validate formats
-            assert record["employee_id"].startswith("EMP"), "Invalid employee ID format"
+            # Validate UUID4 format (8-4-4-4-12 hex digits with hyphens)
+            uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+            assert re.match(uuid_pattern, record["employee_id"]), "Invalid employee ID format (expected UUID4)"
             assert "@company.com" in record["email"], "Invalid email domain"
             assert len(record["phone"]) == 12 and record["phone"].count('-') == 2, "Invalid phone format"
             assert len(record["ssn"]) == 11 and record["ssn"].count('-') == 2, "Invalid SSN format"

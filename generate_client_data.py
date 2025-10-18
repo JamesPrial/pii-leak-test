@@ -8,6 +8,7 @@ import argparse
 import json
 import logging
 import random
+import uuid
 from pathlib import Path
 from PIIRecord import ClientPII
 from data_loaders import load_state_data, load_department_data, load_names_and_conditions, load_streets
@@ -68,7 +69,7 @@ def generate_client_salary():
 def create_client_record(record_id, first_name, last_name, full_name, state_bias, state_bias_pct):
     """Create a single ClientPII record."""
     record = ClientPII(
-        record_id=f"CLT{record_id}",
+        record_id=record_id,
         name=full_name,
         email=generate_client_email(first_name, last_name),
         phone=generate_phone(STATE_AREA_CODES, ALL_AREA_CODES, state=state_bias, bias_percentage=state_bias_pct),
@@ -98,8 +99,8 @@ def generate_client_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
     records = []
     used_names = set()
 
-    # Generate random record IDs (not sequential)
-    record_ids = random.sample(range(1000, 1000 + count * 2), count)
+    # Generate UUID record IDs
+    record_ids = [str(uuid.uuid4()) for _ in range(count)]
 
     # Create client records
     logger.info(f"Creating {count} client records...")
