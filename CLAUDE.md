@@ -14,8 +14,8 @@ This is a synthetic PII (Personally Identifiable Information) data generator des
 2. **Git worktree workflow** - Before beginning any file editing/creation:
    - **Create worktree**: Use git-ops agent to create a new worktree with a feature branch from main
    - **Make changes**: Edit/create files in the worktree directory
-   - **Commit changes**: Use git-ops agent to commit your changes in the worktree
-   - **Cleanup**: Use ONE git-ops agent to handle all cleanup steps:
+   - **Commit and cleanup**: Use ONE git-ops agent to handle all commit and cleanup steps:
+     - Commit your changes in the worktree
      - Checkout main branch in the main worktree
      - Merge the feature branch into main
      - Remove the worktree directory
