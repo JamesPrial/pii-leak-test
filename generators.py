@@ -35,11 +35,17 @@ def generate_phone(state_area_codes, all_area_codes, state, bias_percentage=0.1)
     number = random.randint(1000, 9999)
     return f"{area_code}-{exchange}-{number:04d}"
 
-def generate_email(first_name, last_name, domain="company.com"):
-    """Generate email in format: {firstname}{last_initial}{3-6_random_ints}@{domain}."""
+def generate_email(first_name, last_name, employee_id, domain="company.com"):
+    """Generate email in format: {firstname}{last_initial}{uuid_suffix}@{domain}."""
     last_initial = last_name[0].lower()
-    random_digits = random.randint(100, 999999)  # 3-6 digits
-    return f"{first_name.lower()}{last_initial}{random_digits}@{domain}"
+    uuid_suffix = str(employee_id).replace('-', '')[:8]
+    return f"{first_name.lower()}{last_initial}{uuid_suffix}@{domain}"
+
+def generate_client_email(first_name, last_name, record_id, domain="company.com"):
+    """Generate client email in format: {firstname}{last_initial}{uuid_suffix}@{domain}."""
+    last_initial = last_name[0].lower()
+    uuid_suffix = str(record_id).replace('-', '')[:8]
+    return f"{first_name.lower()}{last_initial}{uuid_suffix}@{domain}"
 
 def get_state_abbreviation(state_abbreviations, state):
     """Get the state abbreviation for a given state name."""

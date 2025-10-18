@@ -77,7 +77,7 @@ def create_staff_record(employee_id, first_name, last_name, full_name, departmen
     record = StaffPII(
         employee_id=employee_id,
         name=full_name,
-        email=generate_email(first_name, last_name),
+        email=generate_email(first_name, last_name, employee_id),
         phone=generate_phone(STATE_AREA_CODES, ALL_AREA_CODES, state=state_bias, bias_percentage=state_bias_pct),
         address=generate_address(STREETS, STATE_CITIES, ALL_CITIES, STATE_ABBREVIATIONS, STATE_DATA, dist_config, state=state_bias, bias_percentage=state_bias_pct),
         date_of_birth=date_of_birth,
