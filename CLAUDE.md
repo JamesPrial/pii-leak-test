@@ -12,11 +12,14 @@ This is a synthetic PII (Personally Identifiable Information) data generator des
 
 1. **Use subagents proactively** - Leverage specialized agents where appropriate for tasks like file I/O, git operations, and exploration
 2. **Git worktree workflow** - Before beginning any file editing/creation:
-   - Use the git-ops agent to check out a new git worktree from main
-   - After finishing your changes, commit them
-   - Merge your branch with main
-   - Delete the worktree
-   - Delete the branch you created
+   - **Create worktree**: Use git-ops agent to create a new worktree with a feature branch from main
+   - **Make changes**: Edit/create files in the worktree directory
+   - **Commit changes**: Use git-ops agent to commit your changes in the worktree
+   - **Switch to main**: Use git-ops agent to checkout main branch in the main worktree
+   - **Merge**: Use git-ops agent to merge the feature branch into main
+   - **Remove worktree**: Use git-ops agent to remove the worktree directory
+   - **Delete branch**: Use git-ops agent to delete the feature branch
+   - **Important**: The merge must happen from the main worktree on the main branch, NOT from within the feature worktree
    - All git operations should be done through the git-ops agent
 
 ## Key Commands
