@@ -1,5 +1,66 @@
 {
+  "global_config": {
+    "medical_conditions": {
+      "none_weight": 8,
+      "condition_weight": 1,
+      "default_bias": 0.6,
+      "description": "60% have no medical condition (8 None values for every 1 condition from list)"
+    },
+    "name_suffixes": {
+      "none_weight": 8,
+      "suffix_weight": 1,
+      "description": "~67% have no suffix (8 empty strings for every 1 suffix from list)"
+    },
+    "middle_initials": {
+      "none_weight": 4,
+      "initial_weight": 1,
+      "description": "~18% have no middle initial (4 empty strings for every 1 initial from list)"
+    },
+    "address": {
+      "apartment_probability": 0.3,
+      "description": "30% of addresses include apartment/suite numbers"
+    },
+    "hire_date": {
+      "default_start_year": 2013,
+      "default_end_year": 2022,
+      "recent_hire_bias": 0.0,
+      "description": "Default hire date range 2013-2022, recent_hire_bias=0 means uniform distribution"
+    },
+    "age_ranges": {
+      "executive": {
+        "min": 35,
+        "max": 45,
+        "variance": 8,
+        "description": "VP, Chief, CFO, CTO, CEO, General Counsel level positions"
+      },
+      "senior": {
+        "min": 28,
+        "max": 38,
+        "variance": 8,
+        "description": "Senior, Manager, Director, Lead level positions"
+      },
+      "junior": {
+        "min": 22,
+        "max": 30,
+        "variance": 8,
+        "description": "Coordinator, Assistant, Specialist level positions"
+      },
+      "default": {
+        "min": 24,
+        "max": 35,
+        "variance": 8,
+        "description": "All other positions"
+      }
+    }
+  },
   "Engineering": {
+    "seniority_distribution": {
+      "junior": 2,
+      "senior": 5,
+      "management": 2,
+      "executive": 1,
+      "description": "Engineering skews senior-heavy (20% junior, 50% senior, 20% management, 10% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior Engineer",
@@ -29,6 +90,13 @@
     }
   },
   "HR": {
+    "seniority_distribution": {
+      "junior": 3,
+      "senior": 3,
+      "management": 2,
+      "executive": 1,
+      "description": "HR has balanced distribution (33% junior, 33% senior, 22% management, 11% executive)"
+    },
     "junior": {
       "job_titles": [
         "HR Coordinator",
@@ -57,6 +125,13 @@
     }
   },
   "Sales": {
+    "seniority_distribution": {
+      "junior": 4,
+      "senior": 4,
+      "management": 2,
+      "executive": 1,
+      "description": "Sales has many entry-level reps (36% junior, 36% senior, 18% management, 9% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior Sales Representative"
@@ -85,6 +160,13 @@
     }
   },
   "Marketing": {
+    "seniority_distribution": {
+      "junior": 4,
+      "senior": 3,
+      "management": 2,
+      "executive": 1,
+      "description": "Marketing skews junior (40% junior, 30% senior, 20% management, 10% executive)"
+    },
     "junior": {
       "job_titles": [
         "Marketing Coordinator",
@@ -114,6 +196,13 @@
     }
   },
   "Finance": {
+    "seniority_distribution": {
+      "junior": 2,
+      "senior": 4,
+      "management": 3,
+      "executive": 1,
+      "description": "Finance requires experience (20% junior, 40% senior, 30% management, 10% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior Accountant",
@@ -143,6 +232,13 @@
     }
   },
   "Operations": {
+    "seniority_distribution": {
+      "junior": 3,
+      "senior": 3,
+      "management": 2,
+      "executive": 1,
+      "description": "Operations has balanced distribution (33% junior, 33% senior, 22% management, 11% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior Operations Specialist"
@@ -170,6 +266,13 @@
     }
   },
   "Legal": {
+    "seniority_distribution": {
+      "junior": 1,
+      "senior": 4,
+      "management": 3,
+      "executive": 1,
+      "description": "Legal requires significant experience (11% junior, 44% senior, 33% management, 11% executive)"
+    },
     "junior": {
       "job_titles": [
         "Legal Assistant",
@@ -198,6 +301,13 @@
     }
   },
   "IT": {
+    "seniority_distribution": {
+      "junior": 2,
+      "senior": 4,
+      "management": 3,
+      "executive": 1,
+      "description": "IT requires experience (20% junior, 40% senior, 30% management, 10% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior IT Support Specialist"
@@ -226,6 +336,13 @@
     }
   },
   "Customer Support": {
+    "seniority_distribution": {
+      "junior": 6,
+      "senior": 3,
+      "management": 1,
+      "executive": 1,
+      "description": "Customer Support is very junior-heavy (55% junior, 27% senior, 9% management, 9% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior Support Specialist"
@@ -253,6 +370,13 @@
     }
   },
   "Product": {
+    "seniority_distribution": {
+      "junior": 2,
+      "senior": 4,
+      "management": 3,
+      "executive": 1,
+      "description": "Product requires experience (20% junior, 40% senior, 30% management, 10% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior Product Analyst",
@@ -281,6 +405,13 @@
     }
   },
   "Design": {
+    "seniority_distribution": {
+      "junior": 3,
+      "senior": 4,
+      "management": 2,
+      "executive": 1,
+      "description": "Design has moderate seniority (30% junior, 40% senior, 20% management, 10% executive)"
+    },
     "junior": {
       "job_titles": [
         "Junior Designer"

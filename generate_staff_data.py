@@ -12,13 +12,12 @@ from PIIRecord import StaffPII
 with open("data/values_by_state.json", "r") as f:
     STATE_DATA = json.load(f)
 
-# Load department data from external JSON file
+# Load department data from external JSON file (now includes global_config)
 with open("data/departments.json", "r") as f:
     DEPT_DATA = json.load(f)
 
-# Load distributions configuration from external JSON file
-with open("data/distributions_config.json", "r") as f:
-    DIST_CONFIG = json.load(f)
+# Extract global configuration from departments data
+DIST_CONFIG = DEPT_DATA["global_config"]
 
 # Extract state-specific data
 STATE_SSN_RANGES = {state: data["ssn_ranges"] for state, data in STATE_DATA.items()}
@@ -227,10 +226,11 @@ def generate_hire_date(start_year=None, end_year=None, recent_bias=None):
     random_date = start_date + timedelta(days=days_offset)
     return random_date.strftime("%Y-%m-%d")
 
-def select_seniority_level(is_manager=False):
+def select_seniority_level(department, is_manager=False):
     """Select a seniority level from junior/senior/management/executive.
 
     Args:
+        department: Department name to get distribution weights from
         is_manager: If True, bias toward management/executive levels
 
     Returns:
@@ -240,12 +240,12 @@ def select_seniority_level(is_manager=False):
         # Managers should be from management or executive levels
         return random.choice(["management", "executive"])
     else:
-        # Regular employees can be any level, with realistic distribution
-        # Weight toward senior (40%), junior (30%), management (20%), executive (10%)
-        return random.choices(
-            ["junior", "senior", "management", "executive"],
-            weights=[30, 40, 20, 10]
-        )[0]
+        # Get department-specific seniority distribution weights
+        dist = DEPT_DATA[department]["seniority_distribution"]
+        levels = ["junior", "senior", "management", "executive"]
+        weights = [dist[level] for level in levels]
+
+        return random.choices(levels, weights=weights)[0]
 
 def generate_date_of_birth(hire_date_str, job_title, age_config=None):
     """Generate a date of birth that makes sense with hire date and job level.
@@ -336,10 +336,12 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
                 break
             attempts += 1
         
-        department = random.choice(list(DEPT_DATA.keys()))
+        # Select department (excluding global_config key)
+        dept_names = [k for k in DEPT_DATA.keys() if k != "global_config"]
+        department = random.choice(dept_names)
 
         # Select a management or executive level for managers
-        seniority_level = select_seniority_level(is_manager=True)
+        seniority_level = select_seniority_level(department, is_manager=True)
         job_title = random.choice(DEPT_DATA[department][seniority_level]["job_titles"])
 
         hire_date = generate_hire_date()
@@ -387,10 +389,12 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
                 break
             attempts += 1
 
-        department = random.choice(list(DEPT_DATA.keys()))
+        # Select department (excluding global_config key)
+        dept_names = [k for k in DEPT_DATA.keys() if k != "global_config"]
+        department = random.choice(dept_names)
 
         # Select a seniority level for regular employees
-        seniority_level = select_seniority_level(is_manager=False)
+        seniority_level = select_seniority_level(department, is_manager=False)
         job_title = random.choice(DEPT_DATA[department][seniority_level]["job_titles"])
 
         hire_date = generate_hire_date()
