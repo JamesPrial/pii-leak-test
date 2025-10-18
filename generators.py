@@ -164,3 +164,52 @@ def generate_full_name(first_names, last_names, middle_initials, name_suffixes, 
             return first_name, last_name, full_name
         attempts += 1
     raise ValueError("Failed to generate unique name after 100 attempts")
+
+def generate_credit_card():
+    """Generate a realistic 16-digit credit card number with Luhn checksum."""
+    # Generate first 15 digits
+    # Common IIN ranges: Visa (4), Mastercard (51-55, 2221-2720), Amex (34, 37), Discover (6011, 644-649, 65)
+    card_types = [
+        ("4", 15),  # Visa: starts with 4, total 16 digits
+        ("5" + str(random.randint(1, 5)), 14),  # Mastercard: 51-55
+        ("6011", 12),  # Discover: starts with 6011
+    ]
+    prefix, remaining = random.choice(card_types)
+
+    # Generate remaining digits (except checksum)
+    number_part = prefix + ''.join([str(random.randint(0, 9)) for _ in range(remaining - 1)])
+
+    # Calculate Luhn checksum
+    digits = [int(d) for d in number_part]
+    checksum = 0
+    for i, digit in enumerate(reversed(digits)):
+        if i % 2 == 0:  # Every second digit from right
+            doubled = digit * 2
+            checksum += doubled if doubled < 10 else doubled - 9
+        else:
+            checksum += digit
+
+    check_digit = (10 - (checksum % 10)) % 10
+    return number_part + str(check_digit)
+
+def generate_client_dob():
+    """Generate a date of birth for an adult client (18-90 years old)."""
+    current_year = datetime.now().year
+    # Generate age between 18 and 90
+    age = random.randint(18, 90)
+    # Bias towards middle ages (25-65) for more realistic distribution
+    if random.random() < 0.7:  # 70% of the time, use middle age range
+        age = random.randint(25, 65)
+
+    birth_year = current_year - age
+    birth_month = random.randint(1, 12)
+    birth_day = random.randint(1, 28)  # Use 28 to avoid invalid dates
+    return datetime(birth_year, birth_month, birth_day).strftime("%Y-%m-%d")
+
+def generate_client_email(first_name, last_name):
+    """Generate email with random public domain."""
+    domains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"]
+    domain = random.choice(domains)
+    last_initial = last_name[0].lower()
+    random_digits = random.randint(100, 999999)  # 3-6 digits
+    return f"{first_name.lower()}{last_initial}{random_digits}@{domain}"
