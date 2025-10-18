@@ -94,9 +94,10 @@ class TestGenerators:
 
     def test_generate_email(self):
         """Test email generation."""
-        email = generate_email("John", "Doe")
+        email = generate_email("John", "Doe", "550e8400e29b41d4a716446655440000")
         assert "@company.com" in email
         assert "johnd" in email.lower()
+        assert "550e8400" in email  # First 8 hex chars from employee_id
 
     def test_get_state_abbreviation(self, sample_data):
         """Test state abbreviation lookup."""
@@ -217,6 +218,9 @@ class TestMainLogic:
             # Validate formats
             assert record["employee_id"].startswith("EMP"), "Invalid employee ID format"
             assert "@company.com" in record["email"], "Invalid email domain"
+            # Email should contain first 8 chars from the numeric employee ID (without EMP prefix)
+            numeric_id = record["employee_id"].replace("EMP", "").replace('-', '')[:8]
+            assert numeric_id in record["email"], "Email should contain numeric ID prefix"
             assert len(record["phone"]) == 12 and record["phone"].count('-') == 2, "Invalid phone format"
             assert len(record["ssn"]) == 11 and record["ssn"].count('-') == 2, "Invalid SSN format"
             assert len(record["date_of_birth"]) == 10 and record["date_of_birth"].count('-') == 2, "Invalid DOB format"
