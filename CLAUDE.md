@@ -15,12 +15,13 @@ This is a synthetic PII (Personally Identifiable Information) data generator des
    - **Create worktree**: Use git-ops agent to create a new worktree with a feature branch from main
    - **Make changes**: Edit/create files in the worktree directory
    - **Commit changes**: Use git-ops agent to commit your changes in the worktree
-   - **Switch to main**: Use git-ops agent to checkout main branch in the main worktree
-   - **Merge**: Use git-ops agent to merge the feature branch into main
-   - **Remove worktree**: Use git-ops agent to remove the worktree directory
-   - **Delete branch**: Use git-ops agent to delete the feature branch
+   - **Cleanup**: Use ONE git-ops agent to handle all cleanup steps:
+     - Checkout main branch in the main worktree
+     - Merge the feature branch into main
+     - Remove the worktree directory
+     - Delete the feature branch
    - **Important**: The merge must happen from the main worktree on the main branch, NOT from within the feature worktree
-   - All git operations should be done through the git-ops agent
+   - All git operations should be done through git-ops agents
 
 ## Key Commands
 
