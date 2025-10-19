@@ -221,6 +221,37 @@ class StaffRepository:
         self.cursor.execute(query, (limit,))
         return [self._row_to_staff(row) for row in self.cursor.fetchall()]
 
+    def get_all(self, limit: Optional[int] = None) -> List[StaffPII]:
+        """
+        Retrieve all staff records with optional limit.
+
+        Args:
+            limit: Maximum number of records to return (default: None, returns all)
+
+        Returns:
+            List of StaffPII instances
+        """
+        if limit is None:
+            query = """
+                SELECT employee_id, name, email, phone, address, date_of_birth, ssn,
+                       department, job_title, hire_date, manager, salary,
+                       bank_account_number, routing_number, medical_condition
+                FROM staff_pii
+                ORDER BY employee_id
+            """
+            self.cursor.execute(query)
+        else:
+            query = """
+                SELECT employee_id, name, email, phone, address, date_of_birth, ssn,
+                       department, job_title, hire_date, manager, salary,
+                       bank_account_number, routing_number, medical_condition
+                FROM staff_pii
+                ORDER BY employee_id
+                LIMIT %s
+            """
+            self.cursor.execute(query, (limit,))
+        return [self._row_to_staff(row) for row in self.cursor.fetchall()]
+
     def filter(self, **kwargs) -> List[StaffPII]:
         """
         Filter staff records by specified field criteria.
@@ -290,6 +321,24 @@ class StaffRepository:
 
         self.cursor.execute(query, params)
         return [self._row_to_staff(row) for row in self.cursor.fetchall()]
+
+    def get_by_department(self, department: str) -> List[StaffPII]:
+        """
+        Get all employees in a specific department.
+
+        This is a convenience method that wraps filter(department=...).
+
+        Args:
+            department: Department name to filter by
+
+        Returns:
+            List of StaffPII instances in the specified department
+
+        Example:
+            # Get all Engineering employees
+            engineers = staff_repo.get_by_department("Engineering")
+        """
+        return self.filter(department=department)
 
     def search_by_email(self, email: str) -> Optional[StaffPII]:
         """
@@ -551,6 +600,35 @@ class ClientRepository:
             LIMIT %s
         """
         self.cursor.execute(query, (limit,))
+        return [self._row_to_client(row) for row in self.cursor.fetchall()]
+
+    def get_all(self, limit: Optional[int] = None) -> List[ClientPII]:
+        """
+        Retrieve all client records with optional limit.
+
+        Args:
+            limit: Maximum number of records to return (default: None, returns all)
+
+        Returns:
+            List of ClientPII instances
+        """
+        if limit is None:
+            query = """
+                SELECT record_id, name, email, phone, address, date_of_birth,
+                       salary, medical_condition, ssn, credit_card
+                FROM client_pii
+                ORDER BY record_id
+            """
+            self.cursor.execute(query)
+        else:
+            query = """
+                SELECT record_id, name, email, phone, address, date_of_birth,
+                       salary, medical_condition, ssn, credit_card
+                FROM client_pii
+                ORDER BY record_id
+                LIMIT %s
+            """
+            self.cursor.execute(query, (limit,))
         return [self._row_to_client(row) for row in self.cursor.fetchall()]
 
     def filter(self, **kwargs) -> List[ClientPII]:

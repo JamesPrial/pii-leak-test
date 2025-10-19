@@ -142,11 +142,12 @@ def load_staff_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int:
         INSERT INTO staff_pii (
             employee_id, name, date_of_birth, ssn,
             email, phone, address, department, job_title,
-            hire_date, salary, medical_condition, manager
+            hire_date, salary, bank_account_number, routing_number,
+            medical_condition, manager
         ) VALUES (
             %s, %s, %s, %s,
             %s, %s, %s, %s, %s,
-            %s, %s, %s, NULL
+            %s, %s, %s, %s, %s, NULL
         )
     """
 
@@ -163,6 +164,8 @@ def load_staff_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int:
             record['job_title'],
             record['hire_date'],
             record['salary'],
+            record['bank_account_number'],
+            record['routing_number'],
             record.get('medical_condition', 'None')
         ))
 

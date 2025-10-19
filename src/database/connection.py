@@ -58,6 +58,7 @@ Example .env file:
 """
 
 import os
+from pathlib import Path
 from typing import Optional
 
 import psycopg2
@@ -126,7 +127,9 @@ class DatabaseConnection:
             psycopg2.Error: If connection to the database fails
         """
         # Load environment variables from .env file if present
-        load_dotenv()
+        # Use module directory to ensure .env is found regardless of working directory
+        env_path = Path(__file__).parent / '.env'
+        load_dotenv(env_path)
 
         # Get connection parameters from environment variables
         db_user = os.getenv('POSTGRES_USER', 'postgres')
