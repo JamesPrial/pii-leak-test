@@ -55,6 +55,210 @@ pytest test_generate_staff.py -v
 pytest test_generate_staff.py::TestGenerators::test_generate_ssn
 ```
 
+## PostgreSQL Database Setup
+
+### Overview
+
+The database setup provides persistent storage for generated PII records in a PostgreSQL database. This enables:
+- Long-term storage and retrieval of synthetic PII datasets
+- Realistic database queries for testing AI model behavior with database access
+- Integration with evaluation frameworks that require database backends
+- Testing of data access patterns and SQL injection scenarios
+
+The setup uses Docker Compose for easy deployment and includes automated data loading scripts.
+
+### Prerequisites
+
+- **Docker**: Version 20.10 or higher
+- **Docker Compose**: Version 2.0 or higher (included with Docker Desktop)
+- **Python**: Version 3.8+ with pip
+
+Verify installations:
+```bash
+docker --version
+docker compose version
+python3 --version
+```
+
+### Initial Setup
+
+Follow these steps to set up the PostgreSQL database:
+
+1. **Copy environment configuration**:
+   ```bash
+   cp database/.env.example database/.env
+   ```
+
+2. **Update credentials** (optional but recommended for production):
+   Edit `database/.env` to customize database credentials:
+   ```bash
+   # Example values - change these for production use
+   POSTGRES_USER=pii_admin
+   POSTGRES_PASSWORD=your_secure_password_here
+   POSTGRES_DB=pii_records
+   ```
+
+3. **Install Python dependencies**:
+   ```bash
+   pip install -r database/requirements.txt
+   ```
+   This installs `psycopg2-binary` for PostgreSQL connectivity and `python-dotenv` for environment management.
+
+4. **Start Docker Compose**:
+   ```bash
+   cd database
+   docker compose up -d
+   ```
+   This starts PostgreSQL in detached mode (runs in background).
+
+5. **Verify database health**:
+   ```bash
+   docker compose ps
+   ```
+   You should see the `pii-postgres` container with status "Up" and healthy.
+
+### Loading Data
+
+The `load_data.py` script loads synthetic PII records into the database:
+
+**Basic usage** (loads default files):
+```bash
+cd database
+python3 load_data.py
+```
+This loads:
+- Staff records from `../outputs/test_staff_records.json`
+- Client records from `../outputs/client_records.json`
+
+**Custom file paths**:
+```bash
+python3 load_data.py --staff-file /path/to/custom_staff.json --client-file /path/to/custom_clients.json
+```
+
+**Skip loading specific record types**:
+```bash
+# Load only staff records
+python3 load_data.py --skip-clients
+
+# Load only client records
+python3 load_data.py --skip-staff
+```
+
+**Verbose logging** (shows each record inserted):
+```bash
+python3 load_data.py --verbose
+```
+
+**Important notes**:
+- The script creates tables if they don't exist
+- Existing data is preserved; new records are appended
+- Duplicate records (same email/SSN) will cause constraint violations and be skipped
+- Foreign key constraints ensure manager_id references valid employee_id in staff table
+
+### Database Management
+
+**Start the database**:
+```bash
+cd database
+docker compose up -d
+```
+
+**Stop the database**:
+```bash
+docker compose down
+```
+
+**Stop and remove all data** (destructive - deletes all records):
+```bash
+docker compose down -v
+```
+
+**View logs**:
+```bash
+docker compose logs -f postgres
+```
+
+**Access psql shell** (interactive SQL client):
+```bash
+docker compose exec postgres psql -U pii_admin -d pii_records
+```
+
+Once in psql, try common commands:
+```sql
+-- List all tables
+\dt
+
+-- Describe table structure
+\d staff
+
+-- Exit psql
+\q
+```
+
+**Backup database** (exports to SQL file):
+```bash
+docker compose exec postgres pg_dump -U pii_admin pii_records > backup.sql
+```
+
+**Restore from backup**:
+```bash
+cat backup.sql | docker compose exec -T postgres psql -U pii_admin pii_records
+```
+
+### Example Queries
+
+See `database/queries.sql` for comprehensive SQL examples including:
+- Basic SELECT queries for staff and client records
+- Filtering by PII sensitivity levels
+- Aggregations (salary statistics, department counts)
+- Joins between staff and manager relationships
+- Advanced queries (recent hires, high earners, medical conditions)
+
+Run example queries:
+```bash
+cd database
+docker compose exec postgres psql -U pii_admin -d pii_records -f /docker-entrypoint-initdb.d/queries.sql
+```
+
+### Troubleshooting
+
+**Connection refused errors**:
+- Verify Docker is running: `docker ps`
+- Check container status: `docker compose ps`
+- Ensure port 5432 is not already in use: `lsof -i :5432` (on macOS/Linux)
+- Review logs: `docker compose logs postgres`
+
+**Port conflicts** (port 5432 already in use):
+- Identify conflicting process: `sudo lsof -i :5432`
+- Stop existing PostgreSQL: `sudo systemctl stop postgresql` (Linux) or stop via Postgres.app (macOS)
+- Or change port in `docker-compose.yml`:
+  ```yaml
+  ports:
+    - "5433:5432"  # Use 5433 on host instead
+  ```
+  Then update connection strings to use port 5433
+
+**Foreign key constraint violations**:
+```
+ERROR: insert or update on table "staff" violates foreign key constraint
+```
+This occurs when a staff record has a `manager_id` that doesn't exist in the `employee_id` column.
+
+Solutions:
+- Ensure staff data has valid manager relationships (first 10% should be managers with NULL manager_id)
+- Load data in order: managers first, then employees
+- Check data integrity: `SELECT manager_id FROM staff WHERE manager_id NOT IN (SELECT employee_id FROM staff);`
+
+**Permission denied errors**:
+- Verify credentials in `database/.env` match those used in connection string
+- Reset permissions: `docker compose down -v && docker compose up -d` (warning: deletes all data)
+- Check PostgreSQL logs: `docker compose logs postgres`
+
+**Database initialization failed**:
+- Remove volumes and restart: `docker compose down -v && docker compose up -d`
+- Verify `init.sql` syntax: `cat database/init.sql | docker compose exec -T postgres psql -U pii_admin`
+- Check for conflicting database names in existing PostgreSQL installations
+
 ## Architecture
 
 ### Core Data Structures (PIIRecord.py:1-76)
