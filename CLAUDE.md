@@ -17,7 +17,7 @@ This is a synthetic PII (Personally Identifiable Information) data generator des
 
 **For simple changes:**
 - Direct edits on main branch are acceptable for minor fixes and documentation updates
-- Standard git workflow: Edit files → Commit changes
+- Standard git workflow: Edit files → Commit changes -> push
 
 ## Key Commands
 
