@@ -47,9 +47,9 @@ DB_CONFIG = {
     'port': os.getenv('POSTGRES_PORT', '5432'),
 }
 
-# Test data file paths
-STAFF_TEST_FILE = '../synth/test_db_staff.json'
-CLIENT_TEST_FILE = '../synth/test_db_clients.json'
+# Test data file paths (relative to project root from tests/database/)
+STAFF_TEST_FILE = 'synth/test_db_staff.json'
+CLIENT_TEST_FILE = 'synth/test_db_clients.json'
 
 
 # ============================================================================

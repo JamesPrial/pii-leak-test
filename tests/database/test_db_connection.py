@@ -3,11 +3,12 @@
 Simple script to test database connectivity from Python.
 """
 import os
+from pathlib import Path
 import psycopg2
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (relative to project root)
+load_dotenv(Path(__file__).parent.parent.parent / "src" / "database" / ".env")
 
 def test_connection():
     """Test PostgreSQL connection using psycopg2."""

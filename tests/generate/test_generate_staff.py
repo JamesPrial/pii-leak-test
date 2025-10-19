@@ -1,23 +1,23 @@
 """
-Test suite for generate_client_data.py and related modules.
+Test suite for generate_staff_data.py and related modules.
 Uses pytest for testing data loading, generation functions, and main logic.
 """
 
-import argparse
 import json
 import re
 import pytest
 from pathlib import Path
 from unittest.mock import patch, mock_open
-from data_loaders import load_state_data, load_department_data, load_names_and_conditions, load_streets
-from generators import (
-    generate_ssn, generate_phone, generate_address, generate_credit_card,
-    generate_client_dob, generate_client_email, generate_full_name
+from src.generate.data_loaders import load_state_data, load_department_data, load_names_and_conditions, load_streets
+from src.generate.generators import (
+    generate_ssn, generate_phone, generate_email, get_state_abbreviation, generate_address,
+    generate_bank_account, generate_routing_number, generate_hire_date, select_seniority_level,
+    generate_date_of_birth, generate_full_name
 )
-from generate_client_data import generate_client_pii_records, generate_client_salary, create_client_record
-from PIIRecord import ClientPII
+from src.generate.generate_staff_data import generate_staff_pii_records
+from src.types import StaffPII
 
-# Define test data directory
+# Define test data directory (relative to project root)
 TEST_DATA_DIR = Path("data")
 
 class TestDataLoaders:
@@ -75,47 +75,6 @@ class TestGenerators:
             "streets": streets
         }
 
-    def test_generate_client_salary(self):
-        """Test client salary generation."""
-        salary = generate_client_salary()
-        assert isinstance(salary, int)
-        assert 20000 <= salary <= 250000
-        # Test distribution: low income (20k-45k) ~30%, middle (45k-120k) ~50%, high (120k-250k) ~20%
-        salaries = [generate_client_salary() for _ in range(1000)]
-        low = sum(1 for s in salaries if 20000 <= s <= 45000)
-        middle = sum(1 for s in salaries if 45000 < s <= 120000)
-        high = sum(1 for s in salaries if 120000 < s <= 250000)
-        assert 250 <= low <= 350  # ~30%
-        assert 450 <= middle <= 550  # ~50%
-        assert 150 <= high <= 250  # ~20%
-
-    def test_generate_client_dob(self):
-        """Test client date of birth generation."""
-        dob = generate_client_dob()
-        assert len(dob) == 10
-        assert dob.count('-') == 2
-        # Check age range: 18-90, biased to 25-65
-        from datetime import datetime
-        birth_date = datetime.strptime(dob, "%Y-%m-%d")
-        age = datetime.now().year - birth_date.year
-        assert 18 <= age <= 90
-        # Test bias: most should be 25-65
-        dobs = [generate_client_dob() for _ in range(1000)]
-        ages = [datetime.now().year - datetime.strptime(d, "%Y-%m-%d").year for d in dobs]
-        middle_ages = sum(1 for a in ages if 25 <= a <= 65)
-        assert middle_ages >= 650  # At least 65% in middle range
-
-    def test_generate_client_email(self):
-        """Test client email generation."""
-        email = generate_client_email("John", "Doe")
-        assert "@" in email
-        domains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"]
-        assert any(domain in email for domain in domains)
-        assert "johnd" in email.lower()  # firstname + last initial
-        # Should have random digits
-        import re
-        assert re.search(r'\d{3,6}@', email)
-
     def test_generate_ssn(self, sample_data):
         """Test SSN generation."""
         ssn = generate_ssn(sample_data["state_data_dict"]["state_ssn_ranges"], state="California")
@@ -134,6 +93,20 @@ class TestGenerators:
         assert len(phone) == 12
         assert phone.count('-') == 2
 
+    def test_generate_email(self):
+        """Test email generation."""
+        email = generate_email("John", "Doe", "550e8400e29b41d4a716446655440000")
+        assert "@company.com" in email
+        assert "johnd" in email.lower()
+        assert "550e8400" in email  # First 8 hex chars from employee_id
+
+    def test_get_state_abbreviation(self, sample_data):
+        """Test state abbreviation lookup."""
+        abbrev = get_state_abbreviation(sample_data["state_data_dict"]["state_abbreviations"], "California")
+        assert abbrev == "CA"
+        with pytest.raises(ValueError):
+            get_state_abbreviation(sample_data["state_data_dict"]["state_abbreviations"], "InvalidState")
+
     def test_generate_address(self, sample_data):
         """Test address generation."""
         address = generate_address(
@@ -147,23 +120,36 @@ class TestGenerators:
         assert isinstance(address, str)
         assert "," in address  # Should have commas for city/state/zip
 
-    def test_generate_credit_card(self):
-        """Test credit card generation."""
-        cc = generate_credit_card()
-        assert len(cc) == 16
-        assert cc.isdigit()
-        # Luhn check
-        def luhn_checksum(card_num):
-            def digits_of(n):
-                return [int(d) for d in str(n)]
-            digits = digits_of(card_num)
-            odd_digits = digits[-1::-2]
-            even_digits = digits[-2::-2]
-            checksum = sum(odd_digits)
-            for d in even_digits:
-                checksum += sum(digits_of(d*2))
-            return checksum % 10
-        assert luhn_checksum(cc) == 0
+    def test_generate_bank_account(self):
+        """Test bank account generation."""
+        account = generate_bank_account()
+        assert len(account) == 16
+        assert account.isdigit()
+
+    def test_generate_routing_number(self):
+        """Test routing number generation."""
+        routing = generate_routing_number()
+        assert len(routing) == 9
+        assert routing.isdigit()
+
+    def test_generate_hire_date(self, sample_data):
+        """Test hire date generation."""
+        hire_date = generate_hire_date(sample_data["dist_config"])
+        assert len(hire_date) == 10  # YYYY-MM-DD
+        assert hire_date.count('-') == 2
+
+    def test_select_seniority_level(self, sample_data):
+        """Test seniority level selection."""
+        level = select_seniority_level(sample_data["dept_data"], "Engineering", is_manager=True)
+        assert level in ["management", "executive"]
+        level = select_seniority_level(sample_data["dept_data"], "Engineering", is_manager=False)
+        assert level in ["junior", "senior", "management", "executive"]
+
+    def test_generate_date_of_birth(self):
+        """Test date of birth generation."""
+        dob = generate_date_of_birth("2020-01-01", "Senior Engineer")
+        assert len(dob) == 10
+        assert dob < "2020-01-01"  # Should be before hire date
 
     def test_generate_full_name(self, sample_data):
         """Test full name generation with uniqueness."""
@@ -191,131 +177,88 @@ class TestGenerators:
 class TestMainLogic:
     """Test main generation logic."""
 
-    @pytest.fixture
-    def sample_data(self):
-        """Load sample data for tests."""
-        state_data_dict = load_state_data(TEST_DATA_DIR)
-        dept_data, dist_config = load_department_data(TEST_DATA_DIR)
-        names_dict = load_names_and_conditions(TEST_DATA_DIR, dist_config)
-        streets = load_streets(TEST_DATA_DIR)
-        return {
-            "state_data_dict": state_data_dict,
-            "dept_data": dept_data,
-            "dist_config": dist_config,
-            "names_dict": names_dict,
-            "streets": streets
-        }
-
-    def test_generate_client_pii_records(self):
+    def test_generate_staff_pii_records(self):
         """Test main record generation."""
-        records = generate_client_pii_records(10)
+        records = generate_staff_pii_records(10)
         assert len(records) == 10
-        assert all(isinstance(r, ClientPII) for r in records)
-        # Check uniqueness of record IDs and names
-        ids = [r.record_id for r in records]
+        assert all(isinstance(r, StaffPII) for r in records)
+        # Check uniqueness of employee IDs and names
+        ids = [r.employee_id for r in records]
         names = [r.name for r in records]
         assert len(set(ids)) == 10
         assert len(set(names)) == 10
 
-    def test_generate_client_pii_records_with_bias(self):
+    def test_generate_staff_pii_records_with_bias(self):
         """Test generation with state bias."""
-        records = generate_client_pii_records(5, state_bias="New Jersey", state_bias_pct=1.0)
+        records = generate_staff_pii_records(5, state_bias="New Jersey", state_bias_pct=1.0)
         assert len(records) == 5
         # All addresses should be in NJ (high bias)
         nj_addresses = [r for r in records if "NJ" in r.address]
         assert len(nj_addresses) > 0  # At least some should be biased
 
-    def test_create_client_record(self, sample_data):
-        """Test creating a single client record."""
-        record_id = "test-uuid"
-        first_name = "John"
-        last_name = "Doe"
-        full_name = "John Doe"
-        state_bias = None
-        state_bias_pct = 0.1
-
-        record = create_client_record(record_id, first_name, last_name, full_name, state_bias, state_bias_pct)
-        assert isinstance(record, ClientPII)
-        assert record.record_id == record_id
-        assert record.name == full_name
-        assert "@" in record.email
-        assert "johnd" in record.email.lower()
-        assert isinstance(record.salary, int)
-        assert record.medical_condition in sample_data["names_dict"]["medical_conditions"]
-
-    @patch('argparse.ArgumentParser.parse_args')
-    @patch('builtins.open', new_callable=mock_open)
-    @patch('json.dump')
-    def test_main_function(self, mock_json_dump, mock_file, mock_parse_args):
-        """Test the main function with mocked arguments and file operations."""
-        from generate_client_data import main
-
-        # Mock arguments
-        mock_parse_args.return_value = argparse.Namespace(count=5, output_file="test_output.json")
-
-        # Run main
-        main()
-
-        # Check that json.dump was called
-        mock_json_dump.assert_called_once()
-        # Check the call arguments
-        args, kwargs = mock_json_dump.call_args
-        records_dict = args[0]
-        assert len(records_dict) == 5
-        assert all(isinstance(r, dict) for r in records_dict)
-
-        # Check that open was called with the correct file
-        mock_file.assert_called_once_with("test_output.json", "w")
-
-class TestOutputValidation:
     def test_output_validation(self):
         """Test validation of generated output dictionaries."""
-        records = generate_client_pii_records(10)
+        records = generate_staff_pii_records(10)
         records_dict = [r.to_dict() for r in records]
 
         assert len(records_dict) == 10
 
         # Required fields
         required_fields = [
-            "record_id", "name", "email", "phone", "address", "date_of_birth",
-            "salary", "medical_condition", "ssn", "credit_card"
+            "employee_id", "name", "email", "phone", "address", "date_of_birth",
+            "ssn", "department", "job_title", "hire_date", "salary",
+            "bank_account_number", "routing_number", "medical_condition"
         ]
+        manager_field = "manager"
 
         for record in records_dict:
             for field in required_fields:
                 assert field in record, f"Missing field: {field}"
+            assert manager_field in record  # Manager can be None
 
             # Validate formats
             # Validate UUID4 format (8-4-4-4-12 hex digits with hyphens)
             uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-            assert re.match(uuid_pattern, record["record_id"]), "Invalid record ID format (expected UUID4)"
-            assert "@" in record["email"], "Invalid email format"
+            assert re.match(uuid_pattern, record["employee_id"]), "Invalid employee ID format (expected UUID4)"
+            assert "@company.com" in record["email"], "Invalid email domain"
+            # Email should contain first 8 chars from the numeric employee ID (without EMP prefix)
+            numeric_id = record["employee_id"].replace("EMP", "").replace('-', '')[:8]
+            assert numeric_id in record["email"], "Email should contain numeric ID prefix"
             assert len(record["phone"]) == 12 and record["phone"].count('-') == 2, "Invalid phone format"
             assert len(record["ssn"]) == 11 and record["ssn"].count('-') == 2, "Invalid SSN format"
             assert len(record["date_of_birth"]) == 10 and record["date_of_birth"].count('-') == 2, "Invalid DOB format"
+            assert len(record["hire_date"]) == 10 and record["hire_date"].count('-') == 2, "Invalid hire date format"
             assert isinstance(record["salary"], int) and record["salary"] > 0, "Invalid salary"
-            assert len(record["credit_card"]) == 16 and record["credit_card"].isdigit(), "Invalid credit card"
+            assert len(record["bank_account_number"]) == 16 and record["bank_account_number"].isdigit(), "Invalid bank account"
+            assert len(record["routing_number"]) == 9 and record["routing_number"].isdigit(), "Invalid routing number"
 
-            # Name should be string
-            assert isinstance(record["name"], str) and record["name"]
+            # Department and job title should be strings
+            assert isinstance(record["department"], str) and record["department"]
+            assert isinstance(record["job_title"], str) and record["job_title"]
 
             # Medical condition can be None or string
             assert record["medical_condition"] is None or isinstance(record["medical_condition"], str)
 
+            # Manager should be None for some, string for others
+            assert record["manager"] is None or isinstance(record["manager"], str)
+
         # Uniqueness checks
-        record_ids = [r["record_id"] for r in records_dict]
+        ids = [r["employee_id"] for r in records_dict]
         names = [r["name"] for r in records_dict]
         emails = [r["email"] for r in records_dict]
         ssns = [r["ssn"] for r in records_dict]
         phones = [r["phone"] for r in records_dict]
-        credit_cards = [r["credit_card"] for r in records_dict]
 
-        assert len(set(record_ids)) == 10, "Record IDs not unique"
+        assert len(set(ids)) == 10, "Employee IDs not unique"
         assert len(set(names)) == 10, "Names not unique"
         assert len(set(emails)) == 10, "Emails not unique"
         assert len(set(ssns)) == 10, "SSNs not unique"
         assert len(set(phones)) == 10, "Phones not unique"
-        assert len(set(credit_cards)) == 10, "Credit cards not unique"
+
+        # Manager logic: At least one manager, some employees have managers
+        managers = [r["manager"] for r in records_dict if r["manager"] is not None]
+        assert len(managers) > 0, "No managers assigned"
+        assert len(managers) < 10, "All are managers (should have employees)"
 
 if __name__ == "__main__":
     pytest.main([__file__])

@@ -11,8 +11,8 @@ import sys
 from pathlib import Path
 
 # Import generation functions from existing modules
-from generate_staff_data import generate_staff_pii_records
-from generate_client_data import generate_client_pii_records
+from .generate_staff_data import generate_staff_pii_records
+from .generate_client_data import generate_client_pii_records
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -152,7 +152,7 @@ Examples:
     staff_parser.add_argument(
         '-o', '--output',
         type=str,
-        default='../synth/test_staff_records.json',
+        default='../../synth/test_staff_records.json',
         help='Output file path for staff records (default: synth/test_staff_records.json)'
     )
     staff_parser.add_argument(
@@ -183,7 +183,7 @@ Examples:
     client_parser.add_argument(
         '-o', '--output',
         type=str,
-        default='../synth/client_records.json',
+        default='../../synth/client_records.json',
         help='Output file path for client records (default: synth/client_records.json)'
     )
     client_parser.add_argument(
@@ -214,7 +214,7 @@ Examples:
     both_parser.add_argument(
         '-so', '--staff-output',
         type=str,
-        default='../synth/test_staff_records.json',
+        default='../../synth/test_staff_records.json',
         help='Output file path for staff records (default: synth/test_staff_records.json)'
     )
     both_parser.add_argument(
@@ -226,7 +226,7 @@ Examples:
     both_parser.add_argument(
         '-co', '--client-output',
         type=str,
-        default='../synth/client_records.json',
+        default='../../synth/client_records.json',
         help='Output file path for client records (default: synth/client_records.json)'
     )
     both_parser.add_argument(

@@ -10,9 +10,9 @@ import logging
 import random
 import uuid
 from pathlib import Path
-from PIIRecord import StaffPII
-from data_loaders import load_state_data, load_department_data, load_names_and_conditions, load_streets
-from generators import (
+from src.types import StaffPII
+from .data_loaders import load_state_data, load_department_data, load_names_and_conditions, load_streets
+from .generators import (
     generate_ssn, generate_phone, generate_email, get_state_abbreviation, generate_address,
     generate_bank_account, generate_routing_number, generate_hire_date, select_seniority_level,
     generate_date_of_birth, generate_full_name
@@ -22,8 +22,8 @@ from generators import (
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Define data directory
-DATA_DIR = Path("data")
+# Define data directory (relative to project root)
+DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
 # Load all data using modular loaders
 logger.info("Loading data files...")
@@ -167,7 +167,7 @@ def main():
     parser.add_argument(
         "-o", "--output-file",
         type=str,
-        default="../synth/test_staff_records.json",
+        default="../../synth/test_staff_records.json",
         help="Output file path for generated records (default: synth/test_staff_records.json)"
     )
 

@@ -10,8 +10,8 @@ Usage:
     ./load_data.py [options]
 
 Options:
-    --staff-file PATH      Path to staff records JSON file (default: ../synth/test_staff_records.json)
-    --client-file PATH     Path to client records JSON file (default: ../synth/client_records.json)
+    --staff-file PATH      Path to staff records JSON file (default: ../../synth/test_staff_records.json)
+    --client-file PATH     Path to client records JSON file (default: ../../synth/client_records.json)
     --skip-staff          Skip loading staff records
     --skip-client         Skip loading client records
     --verbose             Enable verbose logging
@@ -243,13 +243,13 @@ def main():
     )
     parser.add_argument(
         '--staff-file',
-        default='../synth/test_staff_records.json',
-        help='Path to staff records JSON file (default: ../synth/test_staff_records.json)'
+        default='../../synth/test_staff_records.json',
+        help='Path to staff records JSON file (default: ../../synth/test_staff_records.json)'
     )
     parser.add_argument(
         '--client-file',
-        default='../synth/client_records.json',
-        help='Path to client records JSON file (default: ../synth/client_records.json)'
+        default='../../synth/client_records.json',
+        help='Path to client records JSON file (default: ../../synth/client_records.json)'
     )
     parser.add_argument(
         '--skip-staff',
