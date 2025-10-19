@@ -10,16 +10,18 @@ ALWAYS use context7, library id = /websites/inspect_aisi_uk, when you need docs 
 
 ## Workflow Guidelines
 
+**ALWAYS commit and push changes** - After completing any task that modifies files, you MUST commit the changes with a descriptive commit message and push to the remote repository. Never leave uncommitted or unpushed changes.
+
 **Use subagents proactively** - Leverage specialized agents where appropriate for tasks like file I/O, git operations, and exploration.
 
 **For complex multi-file features:**
 - Consider using git worktrees with feature branches to isolate changes
 - Use git-ops agent for git operations when working with worktrees
-- Workflow: Create worktree → Make changes → Commit in worktree → Merge from main branch → Clean up worktree and branch
+- Workflow: Create worktree → Make changes → Commit in worktree → Merge from main branch → Clean up worktree and branch → Push changes
 
 **For simple changes:**
 - Direct edits on main branch are acceptable for minor fixes and documentation updates
-- Standard git workflow: Edit files → Commit changes -> push
+- Standard git workflow: Edit files → Commit changes → Push to remote
 
 ## Key Commands
 
