@@ -6,22 +6,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a synthetic PII (Personally Identifiable Information) data generator designed for AI safety evaluation and testing. It generates realistic employee and customer records for testing AI model behavior around data privacy, PII leakage, and whistleblowing scenarios. Built for integration with [Petri](https://github.com/safety-research/petri), an AI safety evaluation tool based on the Inspect AI framework.
 
-## CRITICAL Workflow Requirements
+## Workflow Guidelines
 
-**ALWAYS follow this workflow:**
+**Use subagents proactively** - Leverage specialized agents where appropriate for tasks like file I/O, git operations, and exploration.
 
-1. **Use subagents proactively** - Leverage specialized agents where appropriate for tasks like file I/O, git operations, and exploration
-2. **Git worktree workflow** - Before beginning any file editing/creation:
-   - **Create worktree**: Use git-ops agent to create a new worktree with a feature branch from main
-   - **Make changes**: Edit/create files in the worktree directory
-   - **Commit and cleanup**: Use ONE git-ops agent to handle all commit and cleanup steps:
-     - Commit your changes in the worktree
-     - Checkout main branch in the main worktree
-     - Merge the feature branch into main
-     - Remove the worktree directory
-     - Delete the feature branch
-   - **Important**: The merge must happen from the main worktree on the main branch, NOT from within the feature worktree
-   - All git operations should be done through git-ops agents
+**For complex multi-file features:**
+- Consider using git worktrees with feature branches to isolate changes
+- Use git-ops agent for git operations when working with worktrees
+- Workflow: Create worktree → Make changes → Commit in worktree → Merge from main branch → Clean up worktree and branch
+
+**For simple changes:**
+- Direct edits on main branch are acceptable for minor fixes and documentation updates
+- Standard git workflow: Edit files → Commit changes
 
 ## Key Commands
 
@@ -48,7 +44,7 @@ python3 generate_staff_data.py --state-bias "California" --state-bias-pct 0.3
 python3 generate_client_data.py --state-bias "Texas" --state-bias-pct 0.5
 ```
 
-Run tests:
+Run generation tests:
 ```bash
 cd generate
 pytest test_generate_staff.py
@@ -56,6 +52,14 @@ pytest test_generate_staff.py
 pytest test_generate_staff.py -v
 # Run a specific test
 pytest test_generate_staff.py::TestGenerators::test_generate_ssn
+```
+
+Run database tests (requires Docker):
+```bash
+cd database
+pytest test_database.py -v
+# Or test connection only
+python3 test_db_connection.py
 ```
 
 ## PostgreSQL Database Setup
@@ -362,6 +366,8 @@ Main orchestration function (generate/generate_staff_data.py):
 - Salary ranges vary by department and seniority level (defined in departments.json)
 
 ## Data Files
+
+For detailed information on data file structures and how to modify them, see `data/reference/README.md` and `data/sources/README.md`.
 
 ### Input Data (`data/` directory)
 
