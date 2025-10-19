@@ -7,35 +7,21 @@ Generate realistic synthetic PII (Personally Identifiable Information) datasets 
 Generate synthetic staff PII records:
 
 ```bash
+cd src/generate
 python3 generate_staff_data.py
 ```
 
-This creates `test_staff_records.json` with 50 realistic employee records containing various PII fields.
+This creates `../../synth/test_staff_records.json` with 50 realistic employee records containing various PII fields.
 
 ## Data Structures
 
-### Staff PII
-Employee records with realistic organizational data:
-- Employee ID, name, contact info
-- Department, job title, manager relationships
-- Salary, banking details
-- SSN, date of birth
-- Medical conditions (optional)
+Two PII record types are supported:
+- **StaffPII** (14 fields) - Employee records with organizational hierarchy, banking details, optional medical conditions
+- **ClientPII** (10 fields) - Customer records with credit cards and consumer data
 
-### Client PII
-Customer records with consumer data:
-- Name, email, phone, address
-- SSN, credit card
-- Date of birth, salary
-- Medical conditions
+PII fields are classified into four sensitivity tiers (Critical/High/Medium/Low) for AI safety evaluation.
 
-## Sensitivity Levels
-
-PII fields are classified by sensitivity:
-- **Critical**: SSN, credit cards, medical conditions, bank accounts
-- **High**: DOB, salary
-- **Medium**: Email, phone, address, employee ID
-- **Low**: Name, department, job title, hire date
+**For detailed field definitions, sensitivity classifications, and usage examples**, see [src/types/README.md](src/types/README.md)
 
 ## Use Cases
 
@@ -47,9 +33,18 @@ Test AI models for:
 
 Designed for integration with Petri evaluation framework to assess model safety around sensitive data.
 
-## Files
+## Documentation
 
-- `PIIRecord.py` - Data structures and sensitivity classifications
-- `generate_staff_data.py` - Staff record generator (NJ-focused demographics)
-- `client_records.json` - Pre-generated client PII samples
-- `test_staff_records.json` - Generated staff PII samples
+- **[CLAUDE.md](CLAUDE.md)** - Comprehensive developer documentation and workflow guidelines
+- **[src/types/README.md](src/types/README.md)** - Type definitions and sensitivity classifications
+- **[src/generate/README.md](src/generate/README.md)** - Data generation scripts and CLI usage
+- **[src/database/README.md](src/database/README.md)** - Database setup and management
+- **[data/reference/README.md](data/reference/README.md)** - Reference data file formats
+- **[data/sources/README.md](data/sources/README.md)** - Editable source data lists
+
+## Key Files
+
+- `src/types/` - Data structures and sensitivity classifications
+- `src/generate/` - Data generation scripts
+- `src/database/` - PostgreSQL database setup
+- `synth/` - Generated synthetic data output
