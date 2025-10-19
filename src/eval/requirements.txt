@@ -1,5 +1,6 @@
 # Petri/Inspect AI Framework
 inspect-ai>=0.3.0
+petri @ git+https://github.com/safety-research/petri
 
 # Async PostgreSQL Database Adapter
 asyncpg>=0.29.0
