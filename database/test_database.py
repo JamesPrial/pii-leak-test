@@ -48,8 +48,8 @@ DB_CONFIG = {
 }
 
 # Test data file paths
-STAFF_TEST_FILE = 'outputs/test_db_staff.json'
-CLIENT_TEST_FILE = 'outputs/test_db_clients.json'
+STAFF_TEST_FILE = '../synth/test_db_staff.json'
+CLIENT_TEST_FILE = '../synth/test_db_clients.json'
 
 
 # ============================================================================

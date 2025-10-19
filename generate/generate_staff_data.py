@@ -167,8 +167,8 @@ def main():
     parser.add_argument(
         "-o", "--output-file",
         type=str,
-        default="outputs/test_staff_records.json",
-        help="Output file path for generated records (default: outputs/test_staff_records.json)"
+        default="../synth/test_staff_records.json",
+        help="Output file path for generated records (default: synth/test_staff_records.json)"
     )
 
     args = parser.parse_args()

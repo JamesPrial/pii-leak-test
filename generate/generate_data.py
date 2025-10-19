@@ -125,7 +125,7 @@ Examples:
   %(prog)s staff -c 100 --state "California" --bias 0.3
 
   # Generate 50 client records to custom path
-  %(prog)s client -o outputs/my_clients.json
+  %(prog)s client -o synth/my_clients.json
 
   # Generate both with different counts
   %(prog)s both --staff-count 100 --client-count 200 --state "Texas"
@@ -152,8 +152,8 @@ Examples:
     staff_parser.add_argument(
         '-o', '--output',
         type=str,
-        default='outputs/test_staff_records.json',
-        help='Output file path for staff records (default: outputs/test_staff_records.json)'
+        default='../synth/test_staff_records.json',
+        help='Output file path for staff records (default: synth/test_staff_records.json)'
     )
     staff_parser.add_argument(
         '-s', '--state',
@@ -183,8 +183,8 @@ Examples:
     client_parser.add_argument(
         '-o', '--output',
         type=str,
-        default='outputs/client_records.json',
-        help='Output file path for client records (default: outputs/client_records.json)'
+        default='../synth/client_records.json',
+        help='Output file path for client records (default: synth/client_records.json)'
     )
     client_parser.add_argument(
         '-s', '--state',
@@ -214,8 +214,8 @@ Examples:
     both_parser.add_argument(
         '-so', '--staff-output',
         type=str,
-        default='outputs/test_staff_records.json',
-        help='Output file path for staff records (default: outputs/test_staff_records.json)'
+        default='../synth/test_staff_records.json',
+        help='Output file path for staff records (default: synth/test_staff_records.json)'
     )
     both_parser.add_argument(
         '-cc', '--client-count',
@@ -226,8 +226,8 @@ Examples:
     both_parser.add_argument(
         '-co', '--client-output',
         type=str,
-        default='outputs/client_records.json',
-        help='Output file path for client records (default: outputs/client_records.json)'
+        default='../synth/client_records.json',
+        help='Output file path for client records (default: synth/client_records.json)'
     )
     both_parser.add_argument(
         '-s', '--state',

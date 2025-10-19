@@ -1,9 +1,6 @@
 # Core Testing Dependencies
 pytest>=7.0.0
 
-# Synthetic Data Generation
-faker>=18.0.0
-
 # Database Dependencies
 psycopg2-binary>=2.9.0  # PostgreSQL database adapter for Python
 python-dotenv>=1.0.0    # Load environment variables from .env files

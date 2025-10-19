@@ -130,8 +130,8 @@ def main():
     parser.add_argument(
         "-o", "--output-file",
         type=str,
-        default="outputs/client_records.json",
-        help="Output file path for generated records (default: outputs/client_records.json)"
+        default="../synth/client_records.json",
+        help="Output file path for generated records (default: synth/client_records.json)"
     )
 
     args = parser.parse_args()

@@ -27,11 +27,13 @@ This is a synthetic PII (Personally Identifiable Information) data generator des
 
 Generate synthetic staff PII records:
 ```bash
+cd generate
 python3 generate_staff_data.py
 ```
 
 Generate synthetic client PII records:
 ```bash
+cd generate
 python3 generate_client_data.py
 ```
 
@@ -48,6 +50,7 @@ python3 generate_client_data.py --state-bias "Texas" --state-bias-pct 0.5
 
 Run tests:
 ```bash
+cd generate
 pytest test_generate_staff.py
 # Or run with verbose output
 pytest test_generate_staff.py -v
@@ -127,8 +130,8 @@ cd database
 python3 load_data.py
 ```
 This loads:
-- Staff records from `../outputs/test_staff_records.json`
-- Client records from `../outputs/client_records.json`
+- Staff records from `../synth/test_staff_records.json`
+- Client records from `../synth/client_records.json`
 
 **Custom file paths**:
 ```bash
@@ -261,7 +264,38 @@ Solutions:
 
 ## Architecture
 
-### Core Data Structures (PIIRecord.py:1-76)
+### Directory Structure
+
+```
+/
+├── data/                      # Input data files
+│   ├── reference/            # Structured configuration (rarely edited)
+│   └── sources/              # User-editable value lists
+├── synth/                    # Generated synthetic data output
+├── generate/                 # Data generation code
+│   ├── PIIRecord.py         # Core data structures
+│   ├── data_loaders.py      # Data loading utilities
+│   ├── generators.py        # Field generation functions
+│   ├── generate_staff_data.py
+│   ├── generate_client_data.py
+│   ├── generate_data.py     # Unified CLI
+│   ├── test_generate_staff.py
+│   ├── test_generate_client.py
+│   └── requirements.txt     # Generation dependencies
+├── database/                 # Database setup and tests
+│   ├── docker-compose.yml
+│   ├── init_schema.sql
+│   ├── load_data.py
+│   ├── queries.sql
+│   ├── test_database.py
+│   ├── test_db_connection.py
+│   ├── .env, .env.example
+│   └── requirements.txt     # Database dependencies
+├── README.md
+└── CLAUDE.md
+```
+
+### Core Data Structures (generate/PIIRecord.py:1-76)
 
 Two main dataclasses represent different types of PII records:
 
@@ -272,7 +306,7 @@ Both dataclasses include:
 - A `to_dict()` method for JSON serialization
 - Fields annotated with sensitivity levels in comments
 
-### Sensitivity Classification (PIIRecord.py:70-76)
+### Sensitivity Classification (generate/PIIRecord.py:70-76)
 
 PII fields are classified into four sensitivity tiers defined in `PII_SENSITIVITY_LEVELS`:
 - **Critical**: SSN, credit cards, medical conditions, bank accounts (HIPAA/financial data)
@@ -284,7 +318,7 @@ This classification is crucial for evaluation frameworks to assess different lev
 
 ### Modular Code Structure
 
-The codebase is organized into focused modules:
+The codebase is organized into focused modules in the `generate/` directory:
 - **PIIRecord.py** - Core data structures (ClientPII, StaffPII) and sensitivity classifications
 - **data_loaders.py** - Functions to load external data files and build lookup tables
 - **generators.py** - Individual field generation functions (SSN, phone, email, address, DOB, names, etc.)
@@ -292,7 +326,7 @@ The codebase is organized into focused modules:
 - **generate_client_data.py** - Client/customer record generator with income distribution modeling
 - **test_generate_staff.py** - Comprehensive pytest test suite covering all modules
 
-### Data Generation (generate_staff_data.py)
+### Data Generation (generate/generate_staff_data.py)
 
 The staff data generator creates realistic records with:
 - **External data sources**: Loads from JSON files for maintainability
@@ -313,7 +347,7 @@ The staff data generator creates realistic records with:
   - Hire dates: Configurable date range and recency bias
 - **Non-sequential IDs**: Randomized employee IDs to avoid patterns
 
-Key generation functions (generators.py):
+Key generation functions (generate/generators.py):
 - `generate_ssn(state_ssn_ranges, state, bias_percentage)` - Generates SSN with optional state-specific area code bias
 - `generate_phone(state_area_codes, all_area_codes, state, bias_percentage)` - Generates phone with optional state-specific area code bias
 - `generate_address(streets, state_cities, all_cities, state_abbreviations, state_data, dist_config, state, bias_percentage)` - Generates address with optional state-specific city/zip bias
@@ -323,7 +357,7 @@ Key generation functions (generators.py):
 - `generate_hire_date(dist_config, ...)` - Generates hire dates with optional recent-hire bias
 - `select_seniority_level(dept_data, department, is_manager)` - Selects from junior/senior/management/executive based on department distributions
 
-Main orchestration function (generate_staff_data.py):
+Main orchestration function (generate/generate_staff_data.py):
 - `generate_staff_pii_records(count, state_bias, state_bias_pct)` - Main entry point, creates manager hierarchy then employees
 - Salary ranges vary by department and seniority level (defined in departments.json)
 
@@ -341,9 +375,10 @@ The data directory is organized into two subdirectories:
 - `first_names.txt`, `last_names.txt` - Name lists for generating full names
 - `medical_conditions.txt`, `streets.txt`, `name_suffixes.txt`, `middle_initials.txt` - Additional data lists
 
-### Output Files (`outputs/` directory)
+### Output Files (`synth/` directory)
 - `test_staff_records.json` - Generated staff records (50 by default)
-- `client_records.json` - Pre-generated client PII samples
+- `client_records.json` - Generated client PII samples
+- `test_db_staff.json`, `test_db_clients.json` - Test data for database tests
 
 ## Use Case
 
