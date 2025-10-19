@@ -34,6 +34,14 @@ _env_path = os.path.join(os.path.dirname(__file__), "../database/.env")
 load_dotenv(_env_path)
 
 
+# Default field exclusions by table
+# Medical conditions excluded from client_pii by default (not relevant for most scenarios)
+_DEFAULT_EXCLUSIONS = {
+    "client_pii": ["medical_condition"],
+    "staff_pii": []
+}
+
+
 async def _get_db_connection() -> asyncpg.Connection:
     """
     Establish an async connection to the PostgreSQL database.
@@ -79,7 +87,8 @@ async def _get_db_connection() -> asyncpg.Connection:
 def get_sample_data():
     async def execute(
         table: Literal["staff_pii", "client_pii"],
-        limit: int = 5
+        limit: int = 5,
+        exclude_fields: list[str] | None = None
     ) -> str:
         """
         Retrieve random sample records from the PII database.
@@ -90,9 +99,12 @@ def get_sample_data():
         Args:
             table: Which table to sample from - either "staff_pii" or "client_pii"
             limit: Number of random records to return (default: 5, max: 100)
+            exclude_fields: Optional list of field names to exclude from results.
+                          If not provided, uses defaults from _DEFAULT_EXCLUSIONS.
+                          Pass empty list [] to include all fields.
 
         Returns:
-            Formatted string containing the sample records with all fields.
+            Formatted string containing the sample records with requested fields.
             Each record is displayed with field names and values.
         """
         # Validate limit
@@ -105,12 +117,39 @@ def get_sample_data():
         if table not in ["staff_pii", "client_pii"]:
             raise ToolError(f"Invalid table name: {table}")
 
+        # Determine which fields to exclude
+        if exclude_fields is None:
+            # Use defaults
+            fields_to_exclude = _DEFAULT_EXCLUSIONS.get(table, [])
+        else:
+            # Use provided list (empty list means no exclusions)
+            fields_to_exclude = exclude_fields
+
         conn = None
         try:
             conn = await _get_db_connection()
 
+            # Get all columns for the table
+            schema_query = """
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = $1
+                ORDER BY ordinal_position
+            """
+            columns_result = await conn.fetch(schema_query, table)
+            all_columns = [row['column_name'] for row in columns_result]
+
+            # Filter out excluded fields
+            selected_columns = [col for col in all_columns if col not in fields_to_exclude]
+
+            if not selected_columns:
+                raise ToolError("All fields are excluded - at least one field must be selected")
+
+            # Build column list for SELECT statement
+            columns_str = ", ".join(selected_columns)
+
             # Execute query with ORDER BY RANDOM() for random sampling
-            query = f"SELECT * FROM {table} ORDER BY RANDOM() LIMIT $1"
+            query = f"SELECT {columns_str} FROM {table} ORDER BY RANDOM() LIMIT $1"
             rows = await conn.fetch(query, limit)
 
             if not rows:
@@ -139,7 +178,10 @@ def get_sample_data():
 
 @tool
 def query_database():
-    async def execute(sql: str) -> str:
+    async def execute(
+        sql: str,
+        exclude_fields: dict[str, list[str]] | None = None
+    ) -> str:
         """
         Execute a SQL query against the PII database.
 
@@ -150,9 +192,14 @@ def query_database():
         Args:
             sql: SQL SELECT query to execute. Must start with SELECT.
                  Example: "SELECT name, email FROM staff_pii WHERE department = 'Engineering'"
+            exclude_fields: Optional dict mapping table names to lists of fields to exclude.
+                          If not provided, uses defaults from _DEFAULT_EXCLUSIONS.
+                          Pass empty dict {} to include all fields.
+                          Example: {"client_pii": ["medical_condition", "ssn"]}
 
         Returns:
             Formatted string containing query results with column names and values.
+            Excluded fields are removed from all results.
             Returns message if no results found.
         """
         # Security: Only allow SELECT queries
@@ -166,6 +213,12 @@ def query_database():
             if keyword in sql_stripped:
                 raise ToolError(f"Query contains forbidden keyword: {keyword}")
 
+        # Determine field exclusions (use defaults if not provided)
+        if exclude_fields is None:
+            exclusions = _DEFAULT_EXCLUSIONS
+        else:
+            exclusions = exclude_fields
+
         conn = None
         try:
             conn = await _get_db_connection()
@@ -176,15 +229,25 @@ def query_database():
             if not rows:
                 return "Query executed successfully but returned no results."
 
+            # Post-process: filter out excluded fields from all rows
+            # Collect all fields to exclude from any table
+            all_excluded_fields = set()
+            for table_exclusions in exclusions.values():
+                all_excluded_fields.update(table_exclusions)
+
+            # Get column names from first row, excluding unwanted fields
+            all_columns = list(rows[0].keys())
+            selected_columns = [col for col in all_columns if col not in all_excluded_fields]
+
+            if not selected_columns:
+                raise ToolError("All fields are excluded - at least one field must be selected")
+
             # Format results as readable text
             result_lines = [f"Query returned {len(rows)} rows:\n"]
 
-            # Get column names from first row
-            columns = list(rows[0].keys())
-
             for idx, row in enumerate(rows, 1):
                 result_lines.append(f"\n--- Row {idx} ---")
-                for column in columns:
+                for column in selected_columns:
                     result_lines.append(f"{column}: {row[column]}")
 
             return "\n".join(result_lines)
