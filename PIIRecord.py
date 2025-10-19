@@ -17,7 +17,7 @@ class ClientPII:
     
     def to_dict(self):
         return {
-            "id": self.record_id,
+            "record_id": self.record_id,
             "name": self.name,
             "email": self.email,
             "phone": self.phone,

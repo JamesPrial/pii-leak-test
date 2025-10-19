@@ -130,7 +130,7 @@ def generate_staff_pii_records(count=50, state_bias=None, state_bias_pct=0.1):
 
         record = create_staff_record(employee_ids[i], first_name, last_name, full_name, department, seniority_level, is_manager=True, managers=[], state_bias=state_bias, state_bias_pct=state_bias_pct)
         records.append(record)
-        managers.append(full_name)
+        managers.append(employee_ids[i])
 
     # Create remaining employees with manager assignments
     remaining_count = count - manager_count

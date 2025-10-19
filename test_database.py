@@ -412,14 +412,14 @@ class TestDataLoading:
         inserted_count = 0
         for record in client_test_data:
             db_cursor.execute(insert_query, (
-                record['id'],  # Note: generated data uses 'id', schema uses 'record_id'
+                record['record_id'],  # Note: generated data uses 'record_id', matching schema
                 record['name'],
                 record['email'],
                 record['phone'],
                 record['address'],
                 record['date_of_birth'],
                 record['salary'],
-                record.get('medical_condition', 'None'),
+                record.get('medical_condition') or 'None',  # Handle None/null values
                 record['ssn'],
                 record['credit_card']
             ))
@@ -490,7 +490,7 @@ class TestDataLoading:
             first_record['phone'],
             first_record['address'],
             first_record['date_of_birth'],
-            'different-ssn',
+            '123-45-6789',  # Valid SSN format
             first_record['department'],
             first_record['job_title'],
             first_record['hire_date'],
@@ -853,16 +853,16 @@ class TestDataIntegrity:
         db_connection.commit()
 
         # Verify all manager references are valid
-        # Query should return 0 rows (all managers should be valid employee names)
+        # Query should return 0 rows (all managers should be valid employee IDs)
         db_cursor.execute("""
             SELECT employee_id, manager
             FROM staff_pii
             WHERE manager IS NOT NULL
-                AND manager NOT IN (SELECT name FROM staff_pii)
+                AND manager NOT IN (SELECT employee_id FROM staff_pii)
         """)
         invalid_managers = db_cursor.fetchall()
 
-        # Note: The data uses manager NAME not manager ID, so we check names
+        # Note: The data uses manager employee_id (UUID), so we check against employee_id
         assert len(invalid_managers) == 0, f"Found {len(invalid_managers)} invalid manager references"
 
     def test_ssn_format_validation(

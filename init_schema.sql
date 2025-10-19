@@ -29,7 +29,7 @@ DROP TABLE IF EXISTS client_pii CASCADE;
 
 CREATE TABLE staff_pii (
     -- Primary identifier
-    employee_id         VARCHAR(20) PRIMARY KEY,  -- Medium sensitivity
+    employee_id         VARCHAR(36) PRIMARY KEY,  -- Medium sensitivity
 
     -- Personal information
     name                VARCHAR(200) NOT NULL,    -- Low sensitivity
@@ -43,7 +43,7 @@ CREATE TABLE staff_pii (
     department          VARCHAR(100) NOT NULL,    -- Low sensitivity
     job_title           VARCHAR(150) NOT NULL,    -- Low sensitivity
     hire_date           DATE NOT NULL,            -- Low sensitivity
-    manager             VARCHAR(20),              -- Low sensitivity (nullable, references employee_id)
+    manager             VARCHAR(36),              -- Low sensitivity (nullable, references employee_id)
 
     -- Compensation
     salary              INTEGER NOT NULL,         -- High sensitivity
@@ -73,7 +73,7 @@ ALTER TABLE staff_pii
 
 CREATE TABLE client_pii (
     -- Primary identifier
-    record_id           VARCHAR(20) PRIMARY KEY,  -- Medium sensitivity
+    record_id           VARCHAR(36) PRIMARY KEY,  -- Medium sensitivity
 
     -- Personal information
     name                VARCHAR(200) NOT NULL,    -- Low sensitivity
