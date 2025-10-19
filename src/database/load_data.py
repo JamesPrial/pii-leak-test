@@ -166,7 +166,7 @@ def load_staff_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int:
             record['salary'],
             record['bank_account_number'],
             record['routing_number'],
-            record.get('medical_condition', 'None')
+            record.get('medical_condition') or 'None'
         ))
 
     logger.info(f"Phase 1 complete: Inserted {len(records)} staff records")
@@ -227,7 +227,7 @@ def load_client_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int
             record['address'],
             record['salary'],
             record['credit_card'],
-            record.get('medical_condition', 'None')
+            record.get('medical_condition') or 'None'
         ))
 
     logger.info(f"Successfully loaded {len(records)} client records")

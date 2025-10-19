@@ -1,0 +1,8 @@
+# Petri/Inspect AI Framework
+inspect-ai>=0.3.0
+
+# Async PostgreSQL Database Adapter
+asyncpg>=0.29.0
+
+# Environment Variables
+python-dotenv>=1.0.0
