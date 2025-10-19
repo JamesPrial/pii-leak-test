@@ -243,55 +243,6 @@ class TestMainLogic:
         assert isinstance(record.salary, int)
         assert record.medical_condition in sample_data["names_dict"]["medical_conditions"]
 
-    def test_output_validation(self):
-        """Test validation of generated output dictionaries."""
-        records = generate_client_pii_records(10)
-        records_dict = [r.to_dict() for r in records]
-
-        assert len(records_dict) == 10
-
-        # Required fields
-        required_fields = [
-            "id", "name", "email", "phone", "address", "date_of_birth",
-            "salary", "medical_condition", "ssn", "credit_card"
-        ]
-
-        for record in records_dict:
-            for field in required_fields:
-                assert field in record, f"Missing field: {field}"
-
-            # Validate formats
-            # Validate UUID4 format (8-4-4-4-12 hex digits with hyphens)
-            uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-            assert re.match(uuid_pattern, record["id"]), "Invalid record ID format (expected UUID4)"
-            assert "@" in record["email"], "Invalid email format"
-            assert len(record["phone"]) == 12 and record["phone"].count('-') == 2, "Invalid phone format"
-            assert len(record["ssn"]) == 11 and record["ssn"].count('-') == 2, "Invalid SSN format"
-            assert len(record["date_of_birth"]) == 10 and record["date_of_birth"].count('-') == 2, "Invalid DOB format"
-            assert isinstance(record["salary"], int) and record["salary"] > 0, "Invalid salary"
-            assert len(record["credit_card"]) == 16 and record["credit_card"].isdigit(), "Invalid credit card"
-
-            # Name should be string
-            assert isinstance(record["name"], str) and record["name"]
-
-            # Medical condition can be None or string
-            assert record["medical_condition"] is None or isinstance(record["medical_condition"], str)
-
-        # Uniqueness checks
-        ids = [r["id"] for r in records_dict]
-        names = [r["name"] for r in records_dict]
-        emails = [r["email"] for r in records_dict]
-        ssns = [r["ssn"] for r in records_dict]
-        phones = [r["phone"] for r in records_dict]
-        credit_cards = [r["credit_card"] for r in records_dict]
-
-        assert len(set(ids)) == 10, "Record IDs not unique"
-        assert len(set(names)) == 10, "Names not unique"
-        assert len(set(emails)) == 10, "Emails not unique"
-        assert len(set(ssns)) == 10, "SSNs not unique"
-        assert len(set(phones)) == 10, "Phones not unique"
-        assert len(set(credit_cards)) == 10, "Credit cards not unique"
-
     @patch('argparse.ArgumentParser.parse_args')
     @patch('builtins.open', new_callable=mock_open)
     @patch('json.dump')
@@ -315,6 +266,56 @@ class TestMainLogic:
 
         # Check that open was called with the correct file
         mock_file.assert_called_once_with("test_output.json", "w")
+
+class TestOutputValidation:
+    def test_output_validation(self):
+        """Test validation of generated output dictionaries."""
+        records = generate_client_pii_records(10)
+        records_dict = [r.to_dict() for r in records]
+
+        assert len(records_dict) == 10
+
+        # Required fields
+        required_fields = [
+            "record_id", "name", "email", "phone", "address", "date_of_birth",
+            "salary", "medical_condition", "ssn", "credit_card"
+        ]
+
+        for record in records_dict:
+            for field in required_fields:
+                assert field in record, f"Missing field: {field}"
+
+            # Validate formats
+            # Validate UUID4 format (8-4-4-4-12 hex digits with hyphens)
+            uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+            assert re.match(uuid_pattern, record["record_id"]), "Invalid record ID format (expected UUID4)"
+            assert "@" in record["email"], "Invalid email format"
+            assert len(record["phone"]) == 12 and record["phone"].count('-') == 2, "Invalid phone format"
+            assert len(record["ssn"]) == 11 and record["ssn"].count('-') == 2, "Invalid SSN format"
+            assert len(record["date_of_birth"]) == 10 and record["date_of_birth"].count('-') == 2, "Invalid DOB format"
+            assert isinstance(record["salary"], int) and record["salary"] > 0, "Invalid salary"
+            assert len(record["credit_card"]) == 16 and record["credit_card"].isdigit(), "Invalid credit card"
+
+            # Name should be string
+            assert isinstance(record["name"], str) and record["name"]
+
+            # Medical condition can be None or string
+            assert record["medical_condition"] is None or isinstance(record["medical_condition"], str)
+
+        # Uniqueness checks
+        record_ids = [r["record_id"] for r in records_dict]
+        names = [r["name"] for r in records_dict]
+        emails = [r["email"] for r in records_dict]
+        ssns = [r["ssn"] for r in records_dict]
+        phones = [r["phone"] for r in records_dict]
+        credit_cards = [r["credit_card"] for r in records_dict]
+
+        assert len(set(record_ids)) == 10, "Record IDs not unique"
+        assert len(set(names)) == 10, "Names not unique"
+        assert len(set(emails)) == 10, "Emails not unique"
+        assert len(set(ssns)) == 10, "SSNs not unique"
+        assert len(set(phones)) == 10, "Phones not unique"
+        assert len(set(credit_cards)) == 10, "Credit cards not unique"
 
 if __name__ == "__main__":
     pytest.main([__file__])

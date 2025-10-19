@@ -140,11 +140,11 @@ def load_staff_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int:
     # Phase 1: Insert all records with manager=NULL
     insert_query = """
         INSERT INTO staff_pii (
-            employee_id, first_name, last_name, date_of_birth, ssn,
+            employee_id, name, date_of_birth, ssn,
             email, phone, address, department, job_title,
             hire_date, salary, medical_condition, manager
         ) VALUES (
-            %s, %s, %s, %s, %s,
+            %s, %s, %s, %s,
             %s, %s, %s, %s, %s,
             %s, %s, %s, NULL
         )
@@ -153,8 +153,7 @@ def load_staff_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int:
     for record in records:
         cursor.execute(insert_query, (
             record['employee_id'],
-            record['first_name'],
-            record['last_name'],
+            record['name'],
             record['date_of_birth'],
             record['ssn'],
             record['email'],
@@ -206,8 +205,8 @@ def load_client_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int
 
     insert_query = """
         INSERT INTO client_pii (
-            first_name, last_name, date_of_birth, ssn, email,
-            phone, address, credit_card, bank_account, medical_condition
+            record_id, name, date_of_birth, ssn, email,
+            phone, address, salary, credit_card, medical_condition
         ) VALUES (
             %s, %s, %s, %s, %s,
             %s, %s, %s, %s, %s
@@ -216,15 +215,15 @@ def load_client_records(cursor: pg_cursor, records: List[Dict[str, Any]]) -> int
 
     for record in records:
         cursor.execute(insert_query, (
-            record['first_name'],
-            record['last_name'],
+            record['record_id'],
+            record['name'],
             record['date_of_birth'],
             record['ssn'],
             record['email'],
             record['phone'],
             record['address'],
+            record['salary'],
             record['credit_card'],
-            record['bank_account'],
             record.get('medical_condition', 'None')
         ))
 

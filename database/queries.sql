@@ -11,22 +11,22 @@
 
 -- Count total staff records
 SELECT COUNT(*) AS total_staff
-FROM staff;
+FROM staff_pii;
 
 -- Count total client records
 SELECT COUNT(*) AS total_clients
-FROM clients;
+FROM client_pii;
 
 -- View sample staff records (LIMIT 5)
 -- Shows all fields for first 5 staff members
 SELECT *
-FROM staff
+FROM staff_pii
 LIMIT 5;
 
 -- View sample client records (LIMIT 5)
 -- Shows all fields for first 5 clients
 SELECT *
-FROM clients
+FROM client_pii
 LIMIT 5;
 
 
@@ -37,50 +37,50 @@ LIMIT 5;
 -- Select only low sensitivity fields from staff
 -- Low sensitivity: name, department, job_title, hire_date
 SELECT
-    full_name,
+    name,
     department,
     job_title,
     hire_date
-FROM staff
+FROM staff_pii
 ORDER BY hire_date DESC;
 
 -- Select only low/medium sensitivity fields (exclude critical/high)
 -- Excludes: ssn, dob, salary, bank_account_number, credit_card_number, medical_condition
 SELECT
     employee_id,
-    full_name,
+    name,
     department,
     job_title,
     hire_date,
     email,
-    phone_number,
+    phone,
     address,
-    manager_name
-FROM staff
+    manager
+FROM staff_pii
 ORDER BY employee_id;
 
 -- List critical sensitivity fields only
 -- Critical fields: ssn, bank_account_number, medical_condition
 SELECT
     employee_id,
-    full_name,
+    name,
     ssn,
     bank_account_number,
     medical_condition
-FROM staff
+FROM staff_pii
 WHERE medical_condition IS NOT NULL
    OR bank_account_number IS NOT NULL
 ORDER BY employee_id;
 
 -- Show critical PII fields for clients
 SELECT
-    full_name,
+    name,
     ssn,
-    credit_card_number,
+    credit_card,
     medical_condition
-FROM clients
+FROM client_pii
 WHERE medical_condition IS NOT NULL
-ORDER BY full_name;
+ORDER BY name;
 
 
 -- ============================================================================
@@ -92,7 +92,7 @@ ORDER BY full_name;
 SELECT
     department,
     COUNT(*) AS employee_count
-FROM staff
+FROM staff_pii
 GROUP BY department
 ORDER BY employee_count DESC;
 
@@ -104,30 +104,30 @@ SELECT
     ROUND(AVG(salary), 2) AS avg_salary,
     MIN(salary) AS min_salary,
     MAX(salary) AS max_salary
-FROM staff
+FROM staff_pii
 GROUP BY department
 ORDER BY avg_salary DESC;
 
 -- List managers and their departments
 -- Identifies all managers in the organization
 SELECT
-    full_name,
+    name,
     department,
     job_title,
     email
-FROM staff
-WHERE manager_name IS NULL
+FROM staff_pii
+WHERE manager IS NULL
    OR job_title LIKE '%Manager%'
    OR job_title LIKE '%Director%'
    OR job_title LIKE '%VP%'
-ORDER BY department, full_name;
+ORDER BY department, name;
 
 -- Staff hired per year
 -- Shows hiring trends over time
 SELECT
     EXTRACT(YEAR FROM hire_date) AS hire_year,
     COUNT(*) AS hires_count
-FROM staff
+FROM staff_pii
 GROUP BY hire_year
 ORDER BY hire_year DESC;
 
@@ -141,17 +141,17 @@ ORDER BY hire_year DESC;
 SELECT
     SUBSTRING(address FROM ',\s*([A-Z]{2})\s+\d{5}') AS state,
     COUNT(*) AS employee_count
-FROM staff
+FROM staff_pii
 GROUP BY state
 ORDER BY employee_count DESC;
 
 -- Most common area codes (from phone numbers)
 -- Identifies primary geographic regions based on phone numbers
 SELECT
-    SUBSTRING(phone_number FROM '^\(?(\d{3})\)?') AS area_code,
+    SUBSTRING(phone FROM '^\(?(\d{3})\)?') AS area_code,
     COUNT(*) AS count
-FROM staff
-WHERE phone_number IS NOT NULL
+FROM staff_pii
+WHERE phone IS NOT NULL
 GROUP BY area_code
 ORDER BY count DESC
 LIMIT 10;
@@ -160,7 +160,7 @@ LIMIT 10;
 SELECT
     SUBSTRING(address FROM ',\s*([A-Z]{2})\s+\d{5}') AS state,
     COUNT(*) AS client_count
-FROM clients
+FROM client_pii
 GROUP BY state
 ORDER BY client_count DESC;
 
@@ -172,47 +172,47 @@ ORDER BY client_count DESC;
 -- List all managers with count of direct reports
 -- Shows organizational structure and span of control
 SELECT
-    manager_name,
+    manager,
     COUNT(*) AS direct_reports
-FROM staff
-WHERE manager_name IS NOT NULL
-GROUP BY manager_name
+FROM staff_pii
+WHERE manager IS NOT NULL
+GROUP BY manager
 ORDER BY direct_reports DESC;
 
 -- Find staff without managers
 -- Identifies top-level executives or data quality issues
 SELECT
     employee_id,
-    full_name,
+    name,
     job_title,
     department
-FROM staff
-WHERE manager_name IS NULL
-ORDER BY department, full_name;
+FROM staff_pii
+WHERE manager IS NULL
+ORDER BY department, name;
 
 -- List staff who report to specific manager
 -- Example: Replace 'John Smith' with actual manager name
 SELECT
     employee_id,
-    full_name,
+    name,
     job_title,
     department,
     email
-FROM staff
-WHERE manager_name = 'John Smith'
-ORDER BY job_title, full_name;
+FROM staff_pii
+WHERE manager = 'John Smith'
+ORDER BY job_title, name;
 
 -- Manager hierarchy depth analysis
 -- Shows how many levels of management exist
 SELECT
     CASE
-        WHEN manager_name IS NULL THEN 'Executive (No Manager)'
+        WHEN manager IS NULL THEN 'Executive (No Manager)'
         WHEN job_title LIKE '%VP%' OR job_title LIKE '%Director%' THEN 'Senior Management'
         WHEN job_title LIKE '%Manager%' THEN 'Middle Management'
         ELSE 'Individual Contributor'
     END AS hierarchy_level,
     COUNT(*) AS count
-FROM staff
+FROM staff_pii
 GROUP BY hierarchy_level
 ORDER BY count DESC;
 
@@ -224,12 +224,12 @@ ORDER BY count DESC;
 -- Top 10 highest paid staff members
 -- Identifies highest earners in the organization
 SELECT
-    full_name,
+    name,
     job_title,
     department,
     salary,
     hire_date
-FROM staff
+FROM staff_pii
 ORDER BY salary DESC
 LIMIT 10;
 
@@ -248,7 +248,7 @@ SELECT
     ROUND(AVG(salary), 2) AS avg_salary,
     MIN(salary) AS min_salary,
     MAX(salary) AS max_salary
-FROM staff
+FROM staff_pii
 GROUP BY seniority_level
 ORDER BY avg_salary DESC;
 
@@ -260,7 +260,7 @@ SELECT
     ROUND(AVG(salary), 2) AS avg_salary,
     MIN(salary) AS min_salary,
     MAX(salary) AS max_salary
-FROM staff
+FROM staff_pii
 UNION ALL
 SELECT
     'Clients' AS record_type,
@@ -268,7 +268,7 @@ SELECT
     ROUND(AVG(salary), 2) AS avg_salary,
     MIN(salary) AS min_salary,
     MAX(salary) AS max_salary
-FROM clients
+FROM client_pii
 ORDER BY record_type;
 
 -- Salary percentiles
@@ -277,7 +277,7 @@ SELECT
     PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY salary) AS percentile_25,
     PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY salary) AS median_salary,
     PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY salary) AS percentile_75
-FROM staff;
+FROM staff_pii;
 
 
 -- ============================================================================
@@ -291,14 +291,14 @@ SELECT
     COUNT(medical_condition) AS staff_with_conditions,
     COUNT(*) - COUNT(medical_condition) AS staff_without_conditions,
     ROUND(100.0 * COUNT(medical_condition) / COUNT(*), 2) AS percentage_with_conditions
-FROM staff;
+FROM staff_pii;
 
 -- Most common medical conditions
 -- Identifies prevalent health conditions in staff population
 SELECT
     medical_condition,
     COUNT(*) AS count
-FROM staff
+FROM staff_pii
 WHERE medical_condition IS NOT NULL
 GROUP BY medical_condition
 ORDER BY count DESC;
@@ -310,7 +310,7 @@ SELECT
     COUNT(*) AS total_staff,
     COUNT(medical_condition) AS staff_with_conditions,
     ROUND(100.0 * COUNT(medical_condition) / COUNT(*), 2) AS percentage_with_conditions
-FROM staff
+FROM staff_pii
 GROUP BY department
 ORDER BY percentage_with_conditions DESC;
 
@@ -318,7 +318,7 @@ ORDER BY percentage_with_conditions DESC;
 SELECT
     medical_condition,
     COUNT(*) AS count
-FROM clients
+FROM client_pii
 WHERE medical_condition IS NOT NULL
 GROUP BY medical_condition
 ORDER BY count DESC;
@@ -333,7 +333,7 @@ ORDER BY count DESC;
 SELECT
     ssn,
     COUNT(*) AS occurrence_count
-FROM staff
+FROM staff_pii
 GROUP BY ssn
 HAVING COUNT(*) > 1
 ORDER BY occurrence_count DESC;
@@ -343,7 +343,7 @@ ORDER BY occurrence_count DESC;
 SELECT
     email,
     COUNT(*) AS occurrence_count
-FROM staff
+FROM staff_pii
 GROUP BY email
 HAVING COUNT(*) > 1
 ORDER BY occurrence_count DESC;
@@ -352,10 +352,10 @@ ORDER BY occurrence_count DESC;
 -- Validates phone number format (expects XXX-XXX-XXXX)
 SELECT
     employee_id,
-    full_name,
-    phone_number
-FROM staff
-WHERE phone_number !~ '^\d{3}-\d{3}-\d{4}$'
+    name,
+    phone
+FROM staff_pii
+WHERE phone !~ '^\d{3}-\d{3}-\d{4}$'
 ORDER BY employee_id;
 
 -- Check for NULL values in critical fields
@@ -363,35 +363,35 @@ ORDER BY employee_id;
 SELECT
     'employee_id' AS field_name,
     COUNT(*) AS null_count
-FROM staff
+FROM staff_pii
 WHERE employee_id IS NULL
 UNION ALL
-SELECT 'full_name', COUNT(*) FROM staff WHERE full_name IS NULL
+SELECT 'name', COUNT(*) FROM staff_pii WHERE name IS NULL
 UNION ALL
-SELECT 'ssn', COUNT(*) FROM staff WHERE ssn IS NULL
+SELECT 'ssn', COUNT(*) FROM staff_pii WHERE ssn IS NULL
 UNION ALL
-SELECT 'email', COUNT(*) FROM staff WHERE email IS NULL
+SELECT 'email', COUNT(*) FROM staff_pii WHERE email IS NULL
 UNION ALL
-SELECT 'phone_number', COUNT(*) FROM staff WHERE phone_number IS NULL
+SELECT 'phone', COUNT(*) FROM staff_pii WHERE phone IS NULL
 UNION ALL
-SELECT 'salary', COUNT(*) FROM staff WHERE salary IS NULL
+SELECT 'salary', COUNT(*) FROM staff_pii WHERE salary IS NULL
 ORDER BY null_count DESC;
 
 -- Validate SSN format (XXX-XX-XXXX)
 SELECT
     employee_id,
-    full_name,
+    name,
     ssn
-FROM staff
+FROM staff_pii
 WHERE ssn !~ '^\d{3}-\d{2}-\d{4}$'
 ORDER BY employee_id;
 
 -- Check for future hire dates (data quality issue)
 SELECT
     employee_id,
-    full_name,
+    name,
     hire_date
-FROM staff
+FROM staff_pii
 WHERE hire_date > CURRENT_DATE
 ORDER BY hire_date DESC;
 
@@ -409,7 +409,7 @@ SELECT
     ROUND(STDDEV(salary), 2) AS salary_stddev,
     MIN(salary) AS min_salary,
     MAX(salary) AS max_salary
-FROM staff
+FROM staff_pii
 UNION ALL
 SELECT
     'Clients' AS record_type,
@@ -418,7 +418,7 @@ SELECT
     ROUND(STDDEV(salary), 2) AS salary_stddev,
     MIN(salary) AS min_salary,
     MAX(salary) AS max_salary
-FROM clients;
+FROM client_pii;
 
 -- SSN format validation across both tables
 -- Ensures consistent SSN formatting in both datasets
@@ -427,23 +427,23 @@ SELECT
     COUNT(*) AS total_records,
     SUM(CASE WHEN ssn ~ '^\d{3}-\d{2}-\d{4}$' THEN 1 ELSE 0 END) AS valid_ssn_format,
     SUM(CASE WHEN ssn !~ '^\d{3}-\d{2}-\d{4}$' THEN 1 ELSE 0 END) AS invalid_ssn_format
-FROM staff
+FROM staff_pii
 UNION ALL
 SELECT
     'Clients' AS table_name,
     COUNT(*) AS total_records,
     SUM(CASE WHEN ssn ~ '^\d{3}-\d{2}-\d{4}$' THEN 1 ELSE 0 END) AS valid_ssn_format,
     SUM(CASE WHEN ssn !~ '^\d{3}-\d{2}-\d{4}$' THEN 1 ELSE 0 END) AS invalid_ssn_format
-FROM clients;
+FROM client_pii;
 
 -- Check for SSN overlap between staff and clients
 -- Detects if any individual appears in both tables (should not happen with synthetic data)
 SELECT
     s.ssn,
-    s.full_name AS staff_name,
-    c.full_name AS client_name
-FROM staff s
-INNER JOIN clients c ON s.ssn = c.ssn
+    s.name AS staff_name,
+    c.name AS client_name
+FROM staff_pii s
+INNER JOIN client_pii c ON s.ssn = c.ssn
 ORDER BY s.ssn;
 
 -- Combined age analysis (calculate age from DOB)
@@ -453,14 +453,14 @@ SELECT
     ROUND(AVG(EXTRACT(YEAR FROM AGE(date_of_birth))), 1) AS avg_age,
     MIN(EXTRACT(YEAR FROM AGE(date_of_birth))) AS min_age,
     MAX(EXTRACT(YEAR FROM AGE(date_of_birth))) AS max_age
-FROM staff
+FROM staff_pii
 UNION ALL
 SELECT
     'Clients' AS record_type,
     ROUND(AVG(EXTRACT(YEAR FROM AGE(date_of_birth))), 1) AS avg_age,
     MIN(EXTRACT(YEAR FROM AGE(date_of_birth))) AS min_age,
     MAX(EXTRACT(YEAR FROM AGE(date_of_birth))) AS max_age
-FROM clients;
+FROM client_pii;
 
 -- Email domain distribution across both tables
 -- Analyzes email provider usage patterns
@@ -468,9 +468,9 @@ SELECT
     SUBSTRING(email FROM '@(.+)$') AS email_domain,
     COUNT(*) AS count
 FROM (
-    SELECT email FROM staff
+    SELECT email FROM staff_pii
     UNION ALL
-    SELECT email FROM clients
+    SELECT email FROM client_pii
 ) AS all_emails
 WHERE email IS NOT NULL
 GROUP BY email_domain
@@ -492,7 +492,7 @@ SELECT
         ELSE '10+ years'
     END AS tenure_range,
     COUNT(*) AS employee_count
-FROM staff
+FROM staff_pii
 GROUP BY tenure_range
 ORDER BY
     CASE tenure_range
@@ -510,7 +510,7 @@ SELECT
     ROUND(AVG(EXTRACT(YEAR FROM AGE(date_of_birth))), 1) AS avg_age,
     MIN(EXTRACT(YEAR FROM AGE(date_of_birth))) AS min_age,
     MAX(EXTRACT(YEAR FROM AGE(date_of_birth))) AS max_age
-FROM staff
+FROM staff_pii
 GROUP BY department
 ORDER BY avg_age DESC;
 
@@ -526,7 +526,7 @@ SELECT
     END AS age_range,
     COUNT(*) AS employee_count,
     ROUND(AVG(salary), 2) AS avg_salary
-FROM staff
+FROM staff_pii
 GROUP BY age_range
 ORDER BY
     CASE age_range

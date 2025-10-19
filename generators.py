@@ -41,12 +41,6 @@ def generate_email(first_name, last_name, employee_id, domain="company.com"):
     uuid_suffix = str(employee_id).replace('-', '')[:8]
     return f"{first_name.lower()}{last_initial}{uuid_suffix}@{domain}"
 
-def generate_client_email(first_name, last_name, record_id, domain="company.com"):
-    """Generate client email in format: {firstname}{last_initial}{uuid_suffix}@{domain}."""
-    last_initial = last_name[0].lower()
-    uuid_suffix = str(record_id).replace('-', '')[:8]
-    return f"{first_name.lower()}{last_initial}{uuid_suffix}@{domain}"
-
 def get_state_abbreviation(state_abbreviations, state):
     """Get the state abbreviation for a given state name."""
     abbrev = state_abbreviations.get(state)
