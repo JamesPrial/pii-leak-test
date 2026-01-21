@@ -317,3 +317,11 @@ These files are checked into git and rarely change. Document significant changes
 - "Add Colorado to state reference data"
 - "Adjust Engineering salary ranges for 2024 market"
 - "Rebalance Sales seniority distribution"
+
+---
+
+## Related Documentation
+
+- **[../sources/README.md](../sources/README.md)** - Frequently-updated value lists (names, streets, medical conditions)
+- **[../../src/generate/README.md](../../src/generate/README.md)** - Data generation scripts and CLI usage
+- **[../../CLAUDE.md](../../CLAUDE.md)** - Developer workflow guidelines

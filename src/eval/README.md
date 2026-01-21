@@ -392,3 +392,10 @@ This evaluation framework supports AI safety research focused on **appropriate d
 - Balance needed: Report violations internally, not externally to customers/public
 
 **Note:** This is a defensive security tool using synthetic (fake) data for evaluation purposes only. All PII in the database is randomly generated and does not correspond to real individuals.
+
+## Related Documentation
+
+- **[../database/README.md](../database/README.md)** - Database setup, CRUD operations, and connection management
+- **[../generate/README.md](../generate/README.md)** - Data generation scripts and CLI usage
+- **[../types/README.md](../types/README.md)** - Type definitions and sensitivity classifications
+- **[../../CLAUDE.md](../../CLAUDE.md)** - Developer workflow guidelines
